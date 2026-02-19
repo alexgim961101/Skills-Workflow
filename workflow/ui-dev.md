@@ -1,86 +1,86 @@
 ---
-description: "UI Dev — 컴포넌트 기반 점진 구현, 브라우저 검증, 디자인 시스템 준수 (별도 세션에서 실행)"
+description: "UI Dev — Component-based incremental implementation, browser verification, and design system compliance (run in a dedicated session)"
 ---
 
 # UI Dev (EXECUTION Session — Frontend)
 
-컴포넌트 기반으로 UI를 점진적으로 구현합니다.
-**`.docs/implementation_plan.md`를 읽고 시작합니다.**
+Incrementally implement UI using a component-based approach.
+**Start by reading `.docs/implementation_plan.md`.**
 
-> `task_boundary(Mode=EXECUTION)` 으로 시작
+> Start with `task_boundary(Mode=EXECUTION)`
 
 ## Pre-Flight
 
-1. **Plan 로딩**: `.docs/implementation_plan.md`를 읽습니다.
-2. **Dev Server Detection**: 프로젝트에서 개발 서버를 탐지합니다.
+1. **Load Plan**: Read `.docs/implementation_plan.md`.
+2. **Dev Server Detection**: Detect the development server in the project.
 
-| 프레임워크 | 탐지 | 개발 서버 |
-|-----------|------|----------|
+| Framework | Detection | Dev Server |
+|-----------|-----------|------------|
 | Next.js | `next.config.*` | `npm run dev` |
 | Vite | `vite.config.*` | `npm run dev` |
 | CRA | `react-scripts` in package.json | `npm start` |
 | Vue CLI | `vue.config.*` | `npm run serve` |
 | Nuxt | `nuxt.config.*` | `npm run dev` |
 
-3. **디자인 시스템 확인**: 프로젝트에 디자인 토큰/컴포넌트 라이브러리가 있는지 확인.
-   - CSS Variables, Theme 파일, Storybook 등
+3. **Design System Check**: Verify whether the project has design tokens or a component library.
+   - CSS Variables, Theme files, Storybook, etc.
 
-## Component Chunk Loop (핵심)
+## Component Chunk Loop (Core)
 
-### 1. 컴포넌트 기반 Chunk 분할
+### 1. Component-Based Chunk Splitting
 
-**분할 원칙 (백엔드와 다름):**
-- 원자 → 조합 순서: **기본 컴포넌트 → 복합 컴포넌트 → 페이지**
-- 각 Chunk는 브라우저에서 시각적으로 확인 가능한 단위
-- 스타일과 로직은 같은 Chunk에 포함
-- 반응형은 컴포넌트 구현 시 함께 처리 (나중에 별도로 하지 않음)
+**Splitting principles (different from backend):**
+- Atomic → Composite order: **base components → composite components → pages**
+- Each Chunk must be visually verifiable in the browser
+- Styles and logic are included in the same Chunk
+- Responsiveness is handled during component implementation (not deferred)
 
-`.docs/task.md`에 체크리스트로 기록.
+Record as a checklist in `.docs/task.md`.
 
-### 2. Chunk 구현 → 시각적 검증 → 리뷰 반복
+### 2. Implement Chunk → Visual Verification → Review Loop
 
 ```
-각 Chunk마다:
-  .docs/task.md [/] 마킹 → 코딩
-  ├─ 1. 컴포넌트 구현 (마크업 + 스타일 + 로직)
-  ├─ 2. 디자인 시스템 토큰 사용 확인
-  ├─ 3. 브라우저에서 시각적 확인
-  │     ├─ Desktop 뷰
-  │     ├─ Mobile 뷰 (반응형)
-  │     └─ 인터랙션 동작 (hover, click, 폼)
-  ├─ 4. 빌드 검증 ({VERIFY_CMD})
-  │     ├─ ❌ → 수정 후 재실행
+For each Chunk:
+  Mark [/] in .docs/task.md → Code
+  ├─ 1. Implement component (markup + styles + logic)
+  ├─ 2. Verify design system token usage
+  ├─ 3. Visual check in browser
+  │     ├─ Desktop view
+  │     ├─ Mobile view (responsive)
+  │     └─ Interaction behavior (hover, click, forms)
+  ├─ 4. Build verification ({VERIFY_CMD})
+  │     ├─ ❌ → Fix and re-run
   │     └─ ✅ ↓
-  └─ 5. notify_user 리뷰 요청 (스크린샷 포함)
-       ├─ "승인" → [x] 마킹 → 다음 Chunk
-       ├─ "수정 요청" → 반영 후 재제출
-       └─ "중단" → 현재까지 저장 후 종료
+  └─ 5. notify_user to request review (include screenshots)
+       ├─ "Approved" → Mark [x] → Next Chunk
+       ├─ "Changes requested" → Apply feedback and resubmit
+       └─ "Stop" → Save progress and exit
 ```
 
-**백엔드 `/dev`와의 차이:**
-- 빌드 검증 전에 **브라우저 시각적 확인** 단계 추가
-- 리뷰 요청 시 **스크린샷** 포함 (generate_image 또는 browser 도구 활용)
-- **반응형 체크**가 각 Chunk에 포함
+**Key differences from backend `/dev`:**
+- **Browser visual check** step added before build verification
+- **Screenshots** included in review requests (via generate_image or browser tools)
+- **Responsive check** included in every Chunk
 
-### 3. 스펙 변경 프로토콜
+### 3. Mid-Flight Change Protocol
 
-`/dev`와 동일한 Minor/Medium/Major 프로토콜 적용.
-디자인 변경의 경우:
+Same Minor / Medium / Major protocol as `/dev`.
+For design changes specifically:
 
-| 규모 | 예시 | 대응 |
-|------|------|------|
-| **Minor** | 색상 변경, 패딩 조정 | 현재 Chunk에서 바로 반영 |
-| **Medium** | 레이아웃 변경, 새 컴포넌트 추가 | Plan 갱신 → Chunk 재분할 |
-| **Major** | 전체 디자인 리뉴얼 | 새 `/plan` 세션 |
+| Scope | Example | Action |
+|-------|---------|--------|
+| **Minor** | Color change, padding adjustment | Apply in current Chunk |
+| **Medium** | Layout change, new component added | Update Plan → re-split Chunks |
+| **Major** | Full design overhaul | Start a new `/plan` session |
 
 ## Hand-off
 
 ```
-✅ UI 구현 완료
+✅ UI Implementation Complete
 
-구현된 Chunk: N/N (컴포넌트 N개, 페이지 M개)
-반응형: Desktop ✅ / Mobile ✅
-디자인 시스템 준수: ✅
+Chunks completed: N/N (N components, M pages)
+Responsive: Desktop ✅ / Mobile ✅
+Design system compliance: ✅
 
-다음 단계: 새 세션에서 /test → /review 로 품질 검증을 시작하세요.
+Next step: Start quality verification with /test → /review in a new session.
 ```

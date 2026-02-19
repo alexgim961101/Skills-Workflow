@@ -1,112 +1,112 @@
 ---
-description: "Bugfix — 버그 재현, 근본 원인 분석, 수정, 회귀 테스트까지의 경량 수정 사이클"
+description: "Bugfix — Bug reproduction, root cause analysis, fix, and regression testing in a lightweight cycle"
 ---
 
 # Bugfix Cycle
 
-**Objective:** 버그를 체계적으로 진단하고, 안전하게 수정하며, 회귀를 방지합니다.
-개발 사이클(`/plan` → `/dev` → `/qa`)보다 경량화된 사이클로, 계획 수립 없이 진단부터 시작합니다.
+**Objective:** Systematically diagnose bugs, apply safe fixes, and prevent regressions.
+A lightweight cycle compared to the full `/plan` → `/dev` → `/review` pipeline — starts directly from diagnosis without upfront planning.
 
 ## Flow Overview
 
 ```
-┌───────────────────────────────────────────────┐
-│  DIAGNOSE                                      │
-│  debugging 스킬: 증상 → 재현 → 근본 원인 분석  │
-│  수정 범위가 Structural이면 → /plan 세션 전환    │
-├───────────────────────────────────────────────┤
-│  FIX                                           │
-│  영향 분석 → 코드 수정 → 빌드 검증             │
-│  → 사용자 리뷰                                 │
-├───────────────────────────────────────────────┤
-│  VERIFY                                        │
-│  회귀 테스트 + 수정 검증 + 코드 품질 확인       │
-└───────────────────────────────────────────────┘
+┌───────────────────────────────────────────────────┐
+│  DIAGNOSE                                          │
+│  debugging skill: Symptom → Reproduce → Root Cause │
+│  If scope is Structural → switch to /plan session  │
+├───────────────────────────────────────────────────┤
+│  FIX                                               │
+│  Impact analysis → Code fix → Build verification   │
+│  → User review                                     │
+├───────────────────────────────────────────────────┤
+│  VERIFY                                            │
+│  Regression tests + Fix validation + Code quality  │
+└───────────────────────────────────────────────────┘
 ```
 
 ---
 
 ## Phase 1: DIAGNOSE
 
-`task_boundary(Mode=PLANNING)` 으로 시작합니다.
+Start with `task_boundary(Mode=PLANNING)`.
 
-**스킬: `debugging`**
+**Skill: `debugging`**
 
-1. **증상 정리:** 에러 메시지, 발생 조건, 영향 범위를 정리합니다.
-2. **재현:** 로컬에서 버그를 재현하고, 실패하는 테스트 케이스를 작성합니다.
-3. **근본 원인 분석:** 역추적, 이분 탐색, 가설 검증 등으로 원인을 특정합니다.
-4. **수정 범위 결정:**
-   - **Isolated / Spreading** → Phase 2로 진행
-   - **Structural** → 사용자에게 알리고 `/plan` 세션 전환 권장
+1. **Document symptoms:** Gather error messages, trigger conditions, and affected scope.
+2. **Reproduce:** Reproduce the bug locally and write a failing test case.
+3. **Root cause analysis:** Use backtracking, bisection, and hypothesis testing to pinpoint the cause.
+4. **Determine fix scope:**
+   - **Isolated / Spreading** → Proceed to Phase 2
+   - **Structural** → Notify user and recommend switching to a `/plan` session
 
-수정 계획을 사용자에게 고지합니다:
+Present the diagnosis to the user:
 ```
 🐛 Bug Diagnosis
 
-원인: [근본 원인 요약]
-위치: [파일:라인]
-수정 범위: [Isolated / Spreading / Structural]
-수정 방안: [어떻게 고칠 것인지]
+Cause: [root cause summary]
+Location: [file:line]
+Scope: [Isolated / Spreading / Structural]
+Fix approach: [how it will be fixed]
 
-→ 이대로 수정을 진행할까요?
+→ Proceed with this fix?
 ```
 
 ---
 
 ## Phase 2: FIX
 
-`task_boundary(Mode=EXECUTION)` 으로 전환합니다.
+Switch to `task_boundary(Mode=EXECUTION)`.
 
-### Step 1: 영향 분석
+### Step 1: Impact Analysis
 
-**스킬: `impact-analysis`** (Spreading 이상일 때)
+**Skill: `impact-analysis`** (when scope is Spreading or higher)
 
-- 같은 패턴의 버그가 다른 곳에도 있는지 확인
-- 수정이 다른 기능에 미치는 영향 파악
+- Check if the same bug pattern exists elsewhere
+- Assess how the fix affects other features
 
-### Step 2: 코드 수정
+### Step 2: Code Fix
 
-1. 근본 원인을 수정합니다 (증상 수정 아닌 원인 수정).
-2. Spreading이면 모든 발생 지점을 수정합니다.
-3. `{VERIFY_CMD}` 실행으로 빌드/기존 테스트 통과 확인.
+1. Fix the root cause (not just the symptoms).
+2. If Spreading, fix all occurrences.
+3. Run `{VERIFY_CMD}` to confirm the build passes and existing tests still pass.
 
-### Step 3: 사용자 리뷰
+### Step 3: User Review
 
-`notify_user`로 수정 내용을 리뷰 요청합니다.
-- 승인 → Phase 3로 진행
-- 수정 요청 → 반영 후 재제출
+Use `notify_user` to request review of the fix.
+- Approved → Proceed to Phase 3
+- Changes requested → Apply and resubmit
 
 ---
 
 ## Phase 3: VERIFY
 
-`task_boundary(Mode=VERIFICATION)` 으로 전환합니다.
+Switch to `task_boundary(Mode=VERIFICATION)`.
 
-### Step 1: 수정 검증
+### Step 1: Fix Validation
 
-- Phase 1에서 작성한 **실패 테스트가 이제 통과하는지** 확인
-- 이것이 버그 수정의 핵심 증명입니다
+- Confirm the **failing test from Phase 1 now passes**
+- This is the core proof that the bug is fixed
 
-### Step 2: 회귀 테스트
+### Step 2: Regression Testing
 
-**스킬: `test-strategy`** (Mode B 또는 C)
+**Skill: `test-strategy`** (Mode B or C)
 
-- 수정된 코드의 기존 테스트 스위트 실행
-- 새 회귀 방지 테스트 추가 (동일 버그 재발 방지)
+- Run the existing test suite on the fixed code
+- Add new regression tests to prevent the same bug from recurring
 
-### Step 3: 코드 품질 확인
+### Step 3: Code Quality Check
 
-**스킬: `code-quality-review`** (수정 파일에 한정)
+**Skill: `code-quality-review`** (scoped to changed files only)
 
-- 수정이 새로운 코드 스멜을 도입하지 않았는지 확인
-- Hotfix가 아닌 **깨끗한 수정**인지 검증
+- Verify the fix does not introduce new code smells
+- Confirm it is a **clean fix**, not a hotfix hack
 
 ```
-✅ Bugfix 완료
+✅ Bugfix Complete
 
-진단: [원인 요약]
-수정: [변경 파일 N개]
-검증: 실패 테스트 → 통과 전환 ✅
-회귀: 기존 테스트 전체 통과 ✅
-품질: 🔴 0건, 🟠 0건 ✅
+Diagnosis: [cause summary]
+Fix: [N files changed]
+Validation: Failing test → now passing ✅
+Regression: All existing tests passing ✅
+Quality: 🔴 0, 🟠 0 ✅
 ```
