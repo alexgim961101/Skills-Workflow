@@ -1,66 +1,66 @@
 ---
 name: code-analysis
 description: |
-  코드의 구조, 로직, 실행 흐름을 심층 분석하고 구조화된 보고서를 생성하는 스킬.
-  코드 분석 요청, 실행 흐름 파악, 아키텍처 이해가 필요할 때 사용.
-  트리거: "코드 분석", "코드 설명", "실행 흐름", "code analysis"
+  Skill for deep analysis of code structure, logic, and execution flow, producing structured reports.
+  Used for code analysis requests, execution flow understanding, and architecture comprehension.
+  Triggers: "code analysis", "code explanation", "execution flow", "code walkthrough"
 ---
 
 # Code Analysis
 
 ## Goal
-코드의 작동 방식을 심층적으로 분석하고
-주니어 개발자도 이해할 수 있는 수준의 구조화된 보고서를 생성합니다.
+Perform deep analysis of how code works and
+generate structured reports understandable even by junior developers.
 
 ## Instructions
 
-### Step 1: 분석 범위 파악
+### Step 1: Identify Analysis Scope
 
-- 사용자가 알고 싶은 것을 정확히 식별 (로직 흐름, 변수 상태, side effect, 특정 함수 동작 등)
-- 분석 대상 코드의 범위 결정 (단일 함수 / 클래스 / 모듈 / 전체 흐름)
+- Precisely identify what the user wants to know (logic flow, variable state, side effects, specific function behavior, etc.)
+- Determine the scope of analysis (single function / class / module / full flow)
 
-### Step 2: 심층 코드 검사
+### Step 2: Deep Code Inspection
 
-1. **구문/로직 분석**: 코드의 핵심 알고리즘과 데이터 흐름을 파악
-2. **의존성 추적**: 호출하는 함수/클래스의 정의를 찾아 맥락 확인
-3. **기술적 디테일**: 변수 스코프, 메모리 관리, 비동기 처리, 에러 핸들링 등
+1. **Syntax/Logic analysis**: Identify the core algorithms and data flow
+2. **Dependency tracing**: Find definitions of called functions/classes for context
+3. **Technical details**: Variable scope, memory management, async handling, error handling, etc.
 
-### Step 3: 연관 코드 탐색
+### Step 3: Related Code Exploration
 
-- 분석 대상이 import/호출하는 다른 모듈의 정의를 찾음
-- 인터페이스, 데이터 모델, 유틸리티 함수 등 이해에 필요한 코드 식별
+- Find definitions of other modules that the analysis target imports/calls
+- Identify interfaces, data models, utility functions needed for understanding
 
-### Step 4: 분석 보고서 작성
+### Step 4: Write Analysis Report
 
-아래 구조로 보고서를 작성합니다.
+Write the report using the structure below.
 
 ```markdown
-## 🧐 심층 코드 분석
+## 🧐 Deep Code Analysis
 
-**핵심 요약**: 이 코드가 무엇을 하는지 1~2문장 요약.
+**Key Summary**: 1–2 sentence summary of what this code does.
 
-**상세 로직**: 기술적으로 깊이 있는 분석.
-(변수 범위, 메모리 관리, 비동기 처리, 에러 핸들링 등 포함)
+**Detailed Logic**: In-depth technical analysis.
+(Including variable scope, memory management, async handling, error handling, etc.)
 
-## 🪜 동작 순서 (Step-by-Step Flow)
+## 🪜 Step-by-Step Flow
 
-1. **[단계명]**: 설명 → 결과
-2. **[단계명]**: 설명 → 결과
+1. **[Step Name]**: Description → Result
+2. **[Step Name]**: Description → Result
 3. ...
 
-## 🔗 연관 코드 및 참조
+## 🔗 Related Code & References
 
-- [파일명]: [함수/클래스명] - [역할 한 줄 설명]
+- [filename]: [function/class name] - [One-line role description]
 - ...
 
-## 💡 최적화 및 참고사항
+## 💡 Optimizations & Notes
 
-- 잠재적 버그, 에지 케이스
-- 성능 개선 포인트
-- 주의해야 할 트릭이나 함정
+- Potential bugs, edge cases
+- Performance improvement points
+- Tricks or pitfalls to watch out for
 ```
 
 ## Constraints
-- 모호한 설명("어떤 로직을 수행") 금지 — 구체적으로 *어떤* 로직인지 설명
-- 코드를 직접 읽지 않고 추측하지 않음
-- 한국어로 설명하되, 코드 용어/식별자는 원본 그대로 사용
+- No vague descriptions ("performs some logic") — explain specifically *what* logic
+- Do not guess without actually reading the code
+- Use English for explanations; keep code terms/identifiers as-is from the source

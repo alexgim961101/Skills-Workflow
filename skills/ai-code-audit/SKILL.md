@@ -1,90 +1,90 @@
 ---
 name: ai-code-audit
 description: |
-  AI가 생성한 코드 특유의 문제를 탐지하는 감사 스킬.
-  AI 코드 생성 후, 코드 리뷰, QA 시 사용.
-  트리거: "AI 코드 감사", "AI 점검", "ai audit", "생성 코드 검증"
+  Audit skill for detecting issues specific to AI-generated code.
+  Used after AI code generation, during code reviews, and QA.
+  Triggers: "AI code audit", "AI review", "ai audit", "generated code verification"
 ---
 
 # AI Code Audit
 
 ## Goal
-AI가 생성한 코드에서 자주 발생하는 특유의 문제를 탐지하고,
-사람이 작성한 것과 동일한 품질 수준으로 끌어올립니다.
+Detect common issues specific to AI-generated code and
+bring it up to the same quality level as human-written code.
 
 ## Instructions
 
-### Step 1: 환각 검증 (Hallucination Check)
+### Step 1: Hallucination Check
 
-AI가 존재하지 않는 API, 메서드, 라이브러리를 사용했는지 확인합니다.
+Verify that the AI has not used non-existent APIs, methods, or libraries.
 
-- [ ] **존재하지 않는 메서드**: 호출하는 메서드가 실제 해당 클래스/라이브러리에 존재하는가?
-- [ ] **잘못된 시그니처**: 인자 개수, 타입, 반환 타입이 실제 API와 일치하는가?
-- [ ] **없는 라이브러리**: import하는 패키지가 실제로 존재하고 설치되어 있는가?
-- [ ] **deprecated API**: 더 이상 지원되지 않는 API를 사용하고 있지 않은가?
-- [ ] **버전 불일치**: 프로젝트에서 사용하는 버전에서 지원하는 API인가?
+- [ ] **Non-existent methods**: Does the called method actually exist in the target class/library?
+- [ ] **Wrong signatures**: Do argument count, types, and return types match the actual API?
+- [ ] **Non-existent libraries**: Does the imported package actually exist and is it installed?
+- [ ] **Deprecated APIs**: Are any deprecated/unsupported APIs being used?
+- [ ] **Version mismatch**: Is the API supported in the version used by the project?
 
-**검증 방법:**
-- 빌드/컴파일 실행으로 1차 검증
-- IDE 자동완성으로 메서드 존재 여부 확인
-- 의심스러운 API는 공식 문서에서 확인
+**Verification methods:**
+- Primary verification via build/compile
+- Confirm method existence via IDE autocomplete
+- Verify suspicious APIs against official documentation
 
-### Step 2: 프로젝트 일관성 (Consistency Check)
+### Step 2: Consistency Check
 
-AI가 기존 프로젝트 스타일과 다른 패턴을 도입했는지 확인합니다.
+Verify that the AI has not introduced patterns different from the existing project style.
 
-- [ ] **네이밍 규칙**: 기존 프로젝트의 명명 규칙과 일치하는가?
-  - 예: 프로젝트가 `camelCase`인데 `snake_case`를 사용
-- [ ] **아키텍처 패턴**: 기존 레이어 구조를 따르는가?
-  - 예: 프로젝트가 Repository 패턴인데 서비스에서 DB 직접 접근
-- [ ] **에러 처리 패턴**: 기존 코드와 같은 방식으로 에러를 처리하는가?
-  - 예: 프로젝트가 커스텀 예외를 사용하는데 일반 Exception을 throw
-- [ ] **유틸리티 중복**: 이미 존재하는 유틸리티 함수를 재구현하고 있지 않은가?
-- [ ] **설정 방식**: 기존 설정 관리 방식(env, config 파일 등)을 따르는가?
+- [ ] **Naming conventions**: Does it match the project's existing naming rules?
+  - e.g., Project uses `camelCase` but AI used `snake_case`
+- [ ] **Architecture patterns**: Does it follow the existing layer structure?
+  - e.g., Project uses Repository pattern but service accesses DB directly
+- [ ] **Error handling patterns**: Does it handle errors the same way as existing code?
+  - e.g., Project uses custom exceptions but AI throws generic Exception
+- [ ] **Utility duplication**: Is it re-implementing an already existing utility function?
+- [ ] **Configuration approach**: Does it follow existing config management (env, config files, etc.)?
 
-### Step 3: 과잉 설계 탐지 (Over-Engineering Check)
+### Step 3: Over-Engineering Check
 
-AI가 불필요한 복잡성을 도입했는지 확인합니다.
+Verify that the AI has not introduced unnecessary complexity.
 
-- [ ] **불필요한 추상화**: 구현체가 하나뿐인 인터페이스를 만들었는가?
-  - 예외: DI 목적이거나/테스트 mock 목적이면 OK
-- [ ] **패턴 과잉 적용**: 단순한 로직에 Strategy/Factory/Observer 패턴을 적용했는가?
-- [ ] **불필요한 제네릭**: 타입 파라미터가 실제로 여러 타입에 사용되는가?
-- [ ] **과도한 래핑**: 단순히 위임만 하는 래퍼 클래스/함수가 있는가?
-- [ ] **YAGNI 위반**: 현재 요구사항에 없는 "미래 대비" 코드가 있는가?
+- [ ] **Unnecessary abstraction**: Created an interface with only one implementation?
+  - Exception: OK if for DI/test mock purposes
+- [ ] **Pattern overuse**: Applied Strategy/Factory/Observer pattern to simple logic?
+- [ ] **Unnecessary generics**: Is the type parameter actually used with multiple types?
+- [ ] **Excessive wrapping**: Are there wrapper classes/functions that only delegate?
+- [ ] **YAGNI violation**: Is there "future-proofing" code not required by current requirements?
 
-### Step 4: 완전성 검증 (Completeness Check)
+### Step 4: Completeness Check
 
-AI가 구현을 중간에 빠뜨리거나 불완전하게 남긴 부분을 확인합니다.
+Verify that the AI has not left incomplete or missing implementations.
 
-- [ ] **에러 경로 누락**: Happy path만 구현하고 실패 경로를 무시했는가?
-- [ ] **엣지 케이스 누락**: null, 빈 값, 음수, 최대값 등 경계 조건을 처리하는가?
-- [ ] **리소스 정리 누락**: 열린 연결, 스트림, 파일을 닫고 있는가?
-- [ ] **TODO/FIXME 잔류**: 미완성 마커가 코드에 남아있지 않은가?
-- [ ] **하드코딩된 값**: 설정 가능해야 할 값이 하드코딩되어 있지 않은가?
-- [ ] **트랜잭션 범위**: DB 작업이 적절한 트랜잭션 범위 내에 있는가?
+- [ ] **Missing error paths**: Only happy path implemented, failure paths ignored?
+- [ ] **Missing edge cases**: Are boundary conditions handled (null, empty, negative, max values)?
+- [ ] **Missing resource cleanup**: Are open connections, streams, files being closed?
+- [ ] **Residual TODO/FIXME**: Are there incomplete markers left in the code?
+- [ ] **Hardcoded values**: Are configurable values hardcoded?
+- [ ] **Transaction scope**: Are DB operations within appropriate transaction boundaries?
 
-### Step 5: 결과 보고
+### Step 5: Report Results
 
 ```
 🤖 AI Code Audit
 
-🔴 Hallucination (존재하지 않는 API):
-  - [파일:라인] 메서드/라이브러리명 → 실제 대안
+🔴 Hallucination (Non-existent API):
+  - [file:line] Method/library name → Actual alternative
 
-🟠 Inconsistency (프로젝트 불일치):
-  - [파일:라인] 불일치 유형 → 기존 패턴에 맞게 수정
+🟠 Inconsistency (Project mismatch):
+  - [file:line] Mismatch type → Align with existing pattern
 
-🟡 Over-Engineering (과잉 설계):
-  - [파일:라인] 유형 → 단순화 제안
+🟡 Over-Engineering (Unnecessary complexity):
+  - [file:line] Type → Simplification suggestion
 
-⚪ Incompleteness (누락):
-  - [파일:라인] 누락 유형 → 추가 필요 내용
+⚪ Incompleteness (Missing):
+  - [file:line] Missing type → Required addition
 
-판정: ✅ PASS / ❌ FAIL (🔴 Hallucination 1건 이상이면 FAIL)
+Verdict: ✅ PASS / ❌ FAIL (FAIL if 🔴 Hallucination ≥ 1)
 ```
 
 ## Constraints
-- 🔴 Hallucination은 즉시 FAIL — 존재하지 않는 API 호출은 무조건 수정
-- 과잉 설계 판단은 프로젝트 맥락을 고려 — DI/테스트 목적이면 허용
-- 기존 프로젝트에 나쁜 패턴이 있더라도 "기존 스타일 따르기"를 우선
+- 🔴 Hallucination is an immediate FAIL — non-existent API calls must always be fixed
+- Over-engineering judgment should consider project context — allow if for DI/testing purposes
+- Even if the existing project has bad patterns, prioritize "follow existing style"

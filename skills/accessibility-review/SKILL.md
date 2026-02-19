@@ -1,75 +1,75 @@
 ---
 name: accessibility-review
 description: |
-  웹 접근성(a11y)을 WCAG 2.1 기준으로 점검하는 스킬.
-  프론트엔드 코드 변경, 폼/모달/네비게이션 구현 시 사용.
-  트리거: "접근성 점검", "a11y", "accessibility", "WCAG", "스크린 리더"
+  Skill for checking web accessibility (a11y) against WCAG 2.1 standards.
+  Used for frontend code changes, form/modal/navigation implementations.
+  Triggers: "accessibility review", "a11y", "accessibility", "WCAG", "screen reader"
 ---
 
 # Accessibility Review
 
 ## Goal
-변경된 UI가 WCAG 2.1 AA 기준을 충족하는지 점검하고,
-장애가 있는 사용자도 동등하게 사용할 수 있는지 검증합니다.
+Verify that changed UI meets WCAG 2.1 AA criteria and
+ensure that users with disabilities can use it equally.
 
 ## Instructions
 
-### Step 1: 변경 범위 파악
+### Step 1: Identify Change Scope
 
-- 변경된 컴포넌트에서 접근성에 영향을 주는 요소 식별
-- 인터랙티브 요소 (버튼, 링크, 폼, 모달, 드롭다운) 에 집중
+- Identify elements that affect accessibility in the changed components
+- Focus on interactive elements (buttons, links, forms, modals, dropdowns)
 
-### Step 2: 시맨틱 HTML
+### Step 2: Semantic HTML
 
-- [ ] **올바른 태그**: `<div onclick>` 대신 `<button>` 사용
-- [ ] **헤딩 계층**: `<h1>` → `<h2>` → `<h3>` 순서 (건너뛰기 없음)
-- [ ] **랜드마크**: `<nav>`, `<main>`, `<aside>`, `<footer>` 적절히 사용
-- [ ] **리스트**: 목록 데이터에 `<ul>/<ol>/<li>` 사용
-- [ ] **테이블**: 데이터 테이블에 `<th>`, `scope`, `caption` 사용
+- [ ] **Correct tags**: Use `<button>` instead of `<div onclick>`
+- [ ] **Heading hierarchy**: `<h1>` → `<h2>` → `<h3>` in order (no skipping levels)
+- [ ] **Landmarks**: Proper use of `<nav>`, `<main>`, `<aside>`, `<footer>`
+- [ ] **Lists**: Use `<ul>/<ol>/<li>` for list data
+- [ ] **Tables**: Use `<th>`, `scope`, `caption` for data tables
 
-### Step 3: 키보드 내비게이션
+### Step 3: Keyboard Navigation
 
-- [ ] **포커스 가능**: 모든 인터랙티브 요소에 키보드로 접근 가능한가?
-- [ ] **포커스 순서**: Tab 순서가 시각적 순서와 일치하는가?
-- [ ] **포커스 표시**: 포커스된 요소가 시각적으로 구분되는가? (`outline` 제거 금지)
-- [ ] **키보드 트랩 없음**: 모달/드롭다운에서 Tab으로 빠져나올 수 있는가?
-- [ ] **단축키**: Enter(확인), Escape(닫기), 방향키(목록 탐색)가 작동하는가?
+- [ ] **Focusable**: Are all interactive elements accessible via keyboard?
+- [ ] **Focus order**: Does Tab order match the visual order?
+- [ ] **Focus indicator**: Is the focused element visually distinguishable? (do not remove `outline`)
+- [ ] **No keyboard trap**: Can you Tab out of modals/dropdowns?
+- [ ] **Shortcuts**: Do Enter (confirm), Escape (close), arrow keys (list navigation) work?
 
-### Step 4: ARIA 및 스크린 리더
+### Step 4: ARIA & Screen Reader
 
-- [ ] **alt 텍스트**: 모든 `<img>`에 의미 있는 `alt` 속성 (장식 이미지는 `alt=""`)
-- [ ] **aria-label**: 텍스트 없는 버튼(아이콘 버튼)에 `aria-label` 제공
-- [ ] **aria-live**: 동적으로 변경되는 콘텐츠에 `aria-live` 설정 (토스트, 알림)
-- [ ] **role**: 커스텀 컴포넌트에 적절한 `role` 지정 (dialog, tablist, menu 등)
-- [ ] **aria-expanded/selected**: 토글, 아코디언, 탭의 상태를 전달하는가?
-- [ ] **폼 라벨**: 모든 `<input>`에 연결된 `<label>` 또는 `aria-labelledby`
+- [ ] **alt text**: All `<img>` have meaningful `alt` attributes (decorative images use `alt=""`)
+- [ ] **aria-label**: Text-less buttons (icon buttons) have `aria-label`
+- [ ] **aria-live**: Dynamically changing content has `aria-live` set (toasts, notifications)
+- [ ] **role**: Custom components have appropriate `role` assigned (dialog, tablist, menu, etc.)
+- [ ] **aria-expanded/selected**: Do toggles, accordions, tabs convey their state?
+- [ ] **Form labels**: All `<input>` have associated `<label>` or `aria-labelledby`
 
-### Step 5: 시각적 접근성
+### Step 5: Visual Accessibility
 
-- [ ] **색상 대비**: 텍스트/배경 대비 비율 4.5:1 이상 (AA 기준)
-  - 큰 텍스트(18px 이상): 3:1 이상
-- [ ] **색상 단독 전달 금지**: 색상만으로 정보를 전달하지 않는가? (아이콘/텍스트 병행)
-- [ ] **텍스트 크기 조절**: 200%까지 확대해도 레이아웃이 깨지지 않는가?
-- [ ] **모션 감소**: `prefers-reduced-motion` 미디어 쿼리 대응
+- [ ] **Color contrast**: Text/background contrast ratio 4.5:1 or above (AA standard)
+  - Large text (18px+): 3:1 or above
+- [ ] **No color-only information**: Is information not conveyed by color alone? (use icons/text alongside)
+- [ ] **Text resizing**: Does the layout remain intact when zoomed up to 200%?
+- [ ] **Reduced motion**: Respond to `prefers-reduced-motion` media query
 
-### Step 6: 결과 보고
+### Step 6: Report Results
 
 ```
 ♿ Accessibility Review (WCAG 2.1 AA)
 
-🔴 Critical (접근 불가):
-  - [컴포넌트] 기준 위반: 설명 → 수정 방안
+🔴 Critical (Inaccessible):
+  - [Component] Violation: Description → Fix
 
-🟠 Warning (접근성 저하):
-  - [컴포넌트] 기준: 설명 → 수정 방안
+🟠 Warning (Reduced accessibility):
+  - [Component] Criterion: Description → Fix
 
 🟡 Best Practice:
-  - [컴포넌트] 권장: 설명 → 개선 방안
+  - [Component] Recommendation: Description → Improvement
 
-판정: ✅ PASS / ❌ FAIL (🔴 Critical 1건 이상이면 FAIL)
+Verdict: ✅ PASS / ❌ FAIL (FAIL if 🔴 Critical ≥ 1)
 ```
 
 ## Constraints
-- WCAG 2.1 AA를 기준으로 함 (AAA는 권장 사항으로만)
-- 시맨틱 HTML 우선 — ARIA는 네이티브 HTML로 해결 불가 시에만
-- 자동 도구(axe, lighthouse)와 수동 점검 병행 권장
+- Based on WCAG 2.1 AA (AAA is recommendation only)
+- Semantic HTML first — ARIA only when native HTML cannot solve the issue
+- Recommend combining automated tools (axe, lighthouse) with manual inspection

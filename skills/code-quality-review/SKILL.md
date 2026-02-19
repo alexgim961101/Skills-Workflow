@@ -1,130 +1,130 @@
 ---
 name: code-quality-review
 description: |
-  변경된 코드의 품질을 SOLID, 효율성, 리팩터링 관점에서 심층 점검하는 스킬.
-  코드 리뷰, PR 점검, QA 품질 게이트, 문서 동기화 검증 시 사용.
-  트리거: "코드 리뷰", "품질 점검", "code review", "SOLID 점검", "리팩터링 점검"
+  Skill for deep inspection of changed code quality from SOLID, efficiency, and refactoring perspectives.
+  Used for code reviews, PR checks, QA quality gates, and documentation sync verification.
+  Triggers: "code review", "quality check", "code review", "SOLID check", "refactoring review"
 ---
 
 # Code Quality Review
 
 ## Goal
-변경된 코드가 품질 기준을 충족하는지 점검하고,
-**비효율적 코드와 리팩터링이 필요한 부분까지** 구체적인 개선 방안을 제안합니다.
+Verify that changed code meets quality standards, and
+propose specific improvements **including inefficient code and areas needing refactoring**.
 
 ## Instructions
 
-### Step 1: 점검 범위 결정
+### Step 1: Determine Review Scope
 
-- 변경된 파일 목록 확인 (diff 기반)
-- 변경된 파일만 점검 (전체 코드베이스 리뷰가 아님)
+- Check the list of changed files (diff-based)
+- Review only changed files (not a full codebase review)
 
-### Step 2: 설계 품질 점검
+### Step 2: Design Quality Check
 
-**SOLID 원칙:**
-- [ ] **SRP**: 하나의 클래스/함수가 하나의 책임만 갖는가?
-- [ ] **OCP**: 기존 코드를 수정하지 않고 확장 가능한 구조인가?
-- [ ] **LSP**: 상속/구현이 치환 가능한가?
-- [ ] **ISP**: 불필요한 인터페이스 의존이 없는가?
-- [ ] **DIP**: 상위 모듈이 하위 모듈 구현체에 직접 의존하지 않는가?
+**SOLID Principles:**
+- [ ] **SRP**: Does each class/function have only one responsibility?
+- [ ] **OCP**: Is the structure extensible without modifying existing code?
+- [ ] **LSP**: Are inheritance/implementations substitutable?
+- [ ] **ISP**: Are there unnecessary interface dependencies?
+- [ ] **DIP**: Does the upper module not depend directly on lower module implementations?
 
 **Clean Architecture:**
-- [ ] 도메인 로직이 프레임워크/UI/DB에 독립적인가?
-- [ ] 의존성 방향이 안쪽(도메인)으로 향하는가?
-- [ ] 계층 간 경계가 명확한가?
+- [ ] Is domain logic independent of framework/UI/DB?
+- [ ] Does the dependency direction point inward (toward domain)?
+- [ ] Are layer boundaries clear?
 
-### Step 3: 효율성 점검
+### Step 3: Efficiency Check
 
-**데이터 접근:**
-- [ ] **N+1 쿼리**: 루프 안에서 개별 쿼리를 호출하고 있지 않은가?
-- [ ] **불필요한 전체 조회**: 필요한 컬럼/행만 가져오는가?
-- [ ] **인덱스 누락**: WHERE/JOIN 조건에 인덱스가 필요하지 않은가?
-- [ ] **캐시 활용**: 반복적으로 동일한 데이터를 조회하고 있지 않은가?
+**Data Access:**
+- [ ] **N+1 queries**: Are individual queries being called inside a loop?
+- [ ] **Unnecessary full fetch**: Are only needed columns/rows being fetched?
+- [ ] **Missing indexes**: Do WHERE/JOIN conditions need indexes?
+- [ ] **Cache utilization**: Is the same data being queried repeatedly?
 
-**알고리즘/로직:**
-- [ ] **불필요한 반복**: 중첩 루프를 단순화할 수 있는가? (O(n²) → O(n))
-- [ ] **과도한 객체 생성**: 루프 안에서 불필요한 인스턴스를 생성하지 않는가?
-- [ ] **조기 반환 누락**: 불필요한 연산을 조기 반환으로 피할 수 있는가?
-- [ ] **스트림/컬렉션 남용**: 다중 스트림 체인을 단일 패스로 합칠 수 있는가?
+**Algorithm/Logic:**
+- [ ] **Unnecessary iteration**: Can nested loops be simplified? (O(n²) → O(n))
+- [ ] **Excessive object creation**: Are unnecessary instances created inside loops?
+- [ ] **Missing early return**: Can unnecessary computation be avoided with early returns?
+- [ ] **Stream/Collection abuse**: Can multiple stream chains be merged into a single pass?
 
-**리소스 관리:**
-- [ ] **연결/스트림 미해제**: try-with-resources, defer, using 등으로 보호되는가?
-- [ ] **메모리 누수 패턴**: 이벤트 리스너, 콜백, 캐시가 적절히 정리되는가?
+**Resource Management:**
+- [ ] **Unreleased connections/streams**: Protected by try-with-resources, defer, using, etc.?
+- [ ] **Memory leak patterns**: Are event listeners, callbacks, caches properly cleaned up?
 
-### Step 4: 코드 스멜 & 리팩터링 기회 탐지
+### Step 4: Code Smell & Refactoring Opportunity Detection
 
-아래 패턴이 발견되면 구체적 리팩터링 방안을 제안합니다.
+When the following patterns are found, suggest specific refactoring approaches.
 
-| 코드 스멜 | 탐지 기준 | 리팩터링 제안 |
-|-----------|----------|-------------|
-| **God Object** | 클래스가 5+개 책임, 300+줄 | 책임별 클래스 분리 |
-| **Feature Envy** | 다른 객체의 데이터를 과도하게 참조 | 로직을 데이터 소유 객체로 이동 |
-| **Long Method** | 함수 30+줄 또는 분기 5+개 | Extract Method로 분해 |
-| **Primitive Obsession** | 원시 타입으로 도메인 개념 표현 | Value Object 도입 |
-| **Shotgun Surgery** | 하나의 변경이 여러 클래스에 산탄처럼 퍼짐 | 관련 로직을 하나의 모듈로 응집 |
-| **Duplicated Logic** | 유사 코드 블록 2+곳에 존재 | 공통 함수/유틸로 추출 |
-| **Magic Number/String** | 상수 없이 리터럴 값 직접 사용 | Named Constant 또는 Enum 추출 |
-| **Deep Nesting** | if/for 3단계 이상 중첩 | Guard Clause, Early Return, 분리 |
-| **Boolean Parameter** | 함수가 boolean으로 동작을 분기 | 별도 함수로 분리 또는 Strategy |
+| Code Smell | Detection Criteria | Refactoring Suggestion |
+|------------|-------------------|----------------------|
+| **God Object** | Class has 5+ responsibilities, 300+ lines | Split by responsibility |
+| **Feature Envy** | Excessively references another object's data | Move logic to the data-owning object |
+| **Long Method** | Function 30+ lines or 5+ branches | Decompose with Extract Method |
+| **Primitive Obsession** | Domain concepts expressed with primitive types | Introduce Value Objects |
+| **Shotgun Surgery** | One change scatters across multiple classes | Consolidate related logic into one module |
+| **Duplicated Logic** | Similar code blocks in 2+ places | Extract to common function/utility |
+| **Magic Number/String** | Literal values used without constants | Extract Named Constant or Enum |
+| **Deep Nesting** | 3+ levels of if/for nesting | Guard Clause, Early Return, extraction |
+| **Boolean Parameter** | Function branches behavior on boolean | Split into separate functions or Strategy |
 
-### Step 5: 문서 동기화 확인
+### Step 5: Documentation Sync Check
 
-변경에 따라 문서 갱신이 필요한지 확인합니다.
+Verify whether documentation needs updating based on the changes.
 
-- [ ] 변경된 public API에 Javadoc/JSDoc/Docstring이 반영되었는가?
-- [ ] API 시그니처 변경 시 Swagger/OpenAPI가 업데이트되었는가?
-- [ ] README의 설치/실행 방법이 여전히 유효한가?
+- [ ] Are Javadoc/JSDoc/Docstrings updated for changed public APIs?
+- [ ] Is Swagger/OpenAPI updated for API signature changes?
+- [ ] Are README install/run instructions still valid?
 
-> 문서 자체를 작성하는 것이 아니라, **누락 여부만 지적**합니다.
+> This only **flags omissions**, not writes the documentation itself.
 
-### Step 6: 심각도 분류 및 보고서
+### Step 6: Severity Classification & Report
 
-| 심각도 | 기준 | 대응 |
-|--------|------|------|
-| **🔴 Blocker** | 런타임 에러, 보안 취약점, 데이터 손실 가능 | **반드시 수정** → FAIL |
-| **🟠 Refactor** | 효율성 문제, 코드 스멜, 리팩터링 필요 | **수정 필수** → FAIL |
-| **🟡 Warning** | SOLID 위반, 높은 결합도, 복잡한 분기 | 수정 권장 |
-| **🔵 Info** | 네이밍 개선, 코드 스타일, 미세 최적화 | 참고 사항 |
+| Severity | Criteria | Action |
+|----------|----------|--------|
+| **🔴 Blocker** | Runtime error, security vulnerability, data loss risk | **Must fix** → FAIL |
+| **🟠 Refactor** | Efficiency issue, code smell, refactoring needed | **Must fix** → FAIL |
+| **🟡 Warning** | SOLID violation, high coupling, complex branching | Fix recommended |
+| **🔵 Info** | Naming improvement, code style, micro-optimization | For reference |
 
 ```
 📋 Code Quality Review
 
-점검 파일: N개
-발견 사항: 🔴 X건 / 🟠 Y건 / 🟡 Z건 / 🔵 W건
-판정: ✅ PASS / ❌ FAIL (🔴 또는 🟠 존재 시)
-문서 동기화: ✅ 정상 / ⚠️ N건 누락
+Files reviewed: N
+Findings: 🔴 X / 🟠 Y / 🟡 Z / 🔵 W
+Verdict: ✅ PASS / ❌ FAIL (if 🔴 or 🟠 exists)
+Doc sync: ✅ OK / ⚠️ N items missing
 
-[심각도순으로 나열]
+[Listed by severity]
 
-🔴 [Blocker] 리소스 누수 — ConnectionPool.java
-   - 문제: DB 연결이 finally 블록 없이 사용
-   - 제안: try-with-resources 적용
+🔴 [Blocker] Resource leak — ConnectionPool.java
+   - Issue: DB connection used without finally block
+   - Suggestion: Apply try-with-resources
 
-🟠 [Refactor] N+1 쿼리 — UserService.java:45
-   - 문제: 루프 안에서 findById() 개별 호출 (100명 → 100쿼리)
-   - 제안: findAllById() 배치 조회로 변경
-   - 성능 영향: ~100x 쿼리 감소
+🟠 [Refactor] N+1 query — UserService.java:45
+   - Issue: findById() called individually inside loop (100 users → 100 queries)
+   - Suggestion: Change to findAllById() batch query
+   - Performance impact: ~100x query reduction
 
 🟠 [Refactor] God Object — OrderService.java
-   - 문제: 주문 생성, 결제, 알림, 재고 관리를 한 클래스에서 처리 (450줄)
-   - 제안: OrderCreationService, PaymentService, NotificationService로 분리
-   - 패턴: Facade → 개별 서비스 위임
+   - Issue: Order creation, payment, notification, inventory all in one class (450 lines)
+   - Suggestion: Split into OrderCreationService, PaymentService, NotificationService
+   - Pattern: Facade → delegate to individual services
 
-🟡 [Warning] DIP 위반 — OrderController.java
-   - 문제: OrderRepositoryImpl에 직접 의존
-   - 제안: OrderRepository 인터페이스를 통해 주입
+🟡 [Warning] DIP violation — OrderController.java
+   - Issue: Direct dependency on OrderRepositoryImpl
+   - Suggestion: Inject via OrderRepository interface
 
-⚠️ [Docs] 문서 미동기화 — UserController.java
-   - 문제: 새 엔드포인트 POST /users/bulk 추가됐으나 API 문서 미반영
+⚠️ [Docs] Documentation out of sync — UserController.java
+   - Issue: New endpoint POST /users/bulk added but not reflected in API docs
 ```
 
-**판정 규칙:**
-- 🔴 Blocker 또는 🟠 Refactor가 **1건이라도 있으면 → ❌ FAIL**
-- 🟡 Warning만 있으면 → ✅ PASS (권장 사항으로 기록)
-- 🔵 Info만 있으면 → ✅ PASS
+**Verdict rules:**
+- 🔴 Blocker or 🟠 Refactor **1 or more → ❌ FAIL**
+- 🟡 Warning only → ✅ PASS (recorded as recommendations)
+- 🔵 Info only → ✅ PASS
 
 ## Constraints
-- 단순 불평 대신 **구체적인 디자인 패턴/해결책을 제안**
-- 성능 문제는 **정량적 영향**(쿼리 수, 시간 복잡도 등)을 명시
-- 프로젝트의 기존 스타일과 아키텍처를 존중 (급진적 리팩터링 제안 자제)
-- 🟠 Refactor는 **명확한 비효율/스멜이 있을 때만** — 주관적 선호가 아닌 객관적 기준 적용
+- Suggest **specific design patterns/solutions** instead of vague complaints
+- Performance issues must state **quantitative impact** (query count, time complexity, etc.)
+- Respect the project's existing style and architecture (avoid radical refactoring suggestions)
+- 🟠 Refactor only when there is **clear inefficiency/smell** — apply objective criteria, not subjective preference

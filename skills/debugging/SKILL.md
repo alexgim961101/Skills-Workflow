@@ -1,106 +1,106 @@
 ---
 name: debugging
 description: |
-  버그 재현, 근본 원인 분석, 수정 범위 결정을 위한 체계적 디버깅 스킬.
-  버그 리포트 대응, 에러 조사, 장애 분석 시 사용.
-  트리거: "버그 수정", "에러 분석", "디버깅", "장애 원인", "bug fix"
+  Systematic debugging skill for bug reproduction, root cause analysis, and fix scope determination.
+  Used for bug report response, error investigation, and incident analysis.
+  Triggers: "bug fix", "error analysis", "debugging", "incident root cause", "debug"
 ---
 
 # Debugging
 
 ## Goal
-버그의 근본 원인을 체계적으로 추적하고,
-재현 가능한 증거를 기반으로 수정 범위를 결정합니다.
+Systematically trace the root cause of a bug and
+determine the fix scope based on reproducible evidence.
 
 ## Instructions
 
-### Step 1: 증상 정리
+### Step 1: Symptom Summary
 
-버그 리포트 또는 사용자 설명에서 아래를 추출합니다:
+Extract the following from the bug report or user description:
 
-- **무엇이**: 어떤 동작/결과가 비정상인가?
-- **언제**: 항상? 특정 조건에서만? 최근 배포 이후?
-- **어디서**: 어떤 엔드포인트/화면/서비스에서?
-- **에러 정보**: 에러 메시지, 스택 트레이스, HTTP 상태 코드, 로그
+- **What**: What behavior/result is abnormal?
+- **When**: Always? Only under specific conditions? Since a recent deployment?
+- **Where**: Which endpoint/screen/service?
+- **Error info**: Error message, stack trace, HTTP status code, logs
 
 ```
 🐛 Bug Summary
-증상: [무엇이 어떻게 잘못되는지]
-재현 조건: [알려진 조건 / 불명]
-에러: [메시지 또는 코드]
-최근 변경: [관련 배포/커밋이 있다면]
+Symptom: [What is going wrong and how]
+Reproduction conditions: [Known conditions / Unknown]
+Error: [Message or code]
+Recent changes: [Related deployment/commit if any]
 ```
 
-### Step 2: 재현 (Reproduce)
+### Step 2: Reproduce
 
-수정 전에 반드시 버그를 재현합니다.
+Always reproduce the bug before fixing it.
 
-**재현 전략:**
+**Reproduction strategies:**
 
-| 상황 | 접근법 |
-|------|--------|
-| 에러 메시지가 명확 | 에러 발생 코드 위치 직접 추적 |
-| 특정 입력에서만 발생 | 해당 입력으로 테스트 케이스 작성 |
-| 간헐적 발생 | 로그 분석, 동시성/타이밍 의심 |
-| 환경 의존적 | 환경 변수, 설정, 의존성 버전 비교 |
+| Situation | Approach |
+|-----------|----------|
+| Clear error message | Trace directly to error location in code |
+| Occurs only with specific input | Write test case with that input |
+| Intermittent occurrence | Analyze logs, suspect concurrency/timing |
+| Environment-dependent | Compare env variables, config, dependency versions |
 
-**재현 확인:**
-- [ ] 버그를 로컬에서 재현할 수 있는가?
-- [ ] 재현 가능한 테스트 케이스를 작성했는가? (실패하는 테스트)
+**Reproduction confirmation:**
+- [ ] Can the bug be reproduced locally?
+- [ ] Has a reproducible test case been written? (a failing test)
 
-> 재현할 수 없으면 수정하지 않는다. 추가 정보를 사용자에게 요청한다.
+> If it cannot be reproduced, do not fix it. Request additional information from the user.
 
-### Step 3: 근본 원인 분석 (Root Cause Analysis)
+### Step 3: Root Cause Analysis (RCA)
 
-증상이 아닌 **원인**을 찾습니다.
+Find the **cause**, not the symptom.
 
-**분석 기법:**
+**Analysis techniques:**
 
-| 기법 | 적용 상황 | 방법 |
-|------|----------|------|
-| **역추적** | 에러 위치가 명확할 때 | 스택 트레이스에서 위→아래로 호출 체인 추적 |
-| **이분 탐색** | 언제부터 깨졌는지 불명확 | `git bisect` 또는 로그 시점별 비교 |
-| **가설 검증** | 원인 후보가 여러 개 | 가설 → 로그/코드로 검증 → 배제 반복 |
-| **격리** | 복잡한 시스템 | 의존성을 하나씩 제거하며 원인 모듈 특정 |
-| **데이터 추적** | 잘못된 결과값 | 입력 → 중간 변환 → 출력 경로에서 값 변질 지점 특정 |
+| Technique | When to use | Method |
+|-----------|-------------|--------|
+| **Backtracking** | Error location is clear | Trace call chain top→down from stack trace |
+| **Binary search** | Unclear when it broke | `git bisect` or compare logs by time period |
+| **Hypothesis testing** | Multiple cause candidates | Hypothesis → verify with logs/code → eliminate → repeat |
+| **Isolation** | Complex system | Remove dependencies one by one to identify the causal module |
+| **Data tracing** | Incorrect result values | Identify the corruption point along input → transformation → output path |
 
-**근본 원인 분류:**
+**Root cause classification:**
 
-| 유형 | 예시 | 수정 복잡도 |
-|------|------|-----------|
-| **로직 에러** | 조건문 오류, off-by-one, null 미처리 | 낮음 |
-| **상태 문제** | 레이스 컨디션, 캐시 불일치, 세션 오염 | 높음 |
-| **데이터 문제** | 잘못된 마이그레이션, 오염된 데이터 | 중간~높음 |
-| **환경/설정** | 환경 변수, 버전 불일치, 의존성 충돌 | 낮음 |
-| **외부 의존성** | API 변경, 라이브러리 버그, 인프라 장애 | 가변적 |
+| Type | Example | Fix Complexity |
+|------|---------|---------------|
+| **Logic error** | Condition mistake, off-by-one, null not handled | Low |
+| **State issue** | Race condition, cache inconsistency, session corruption | High |
+| **Data issue** | Bad migration, corrupted data | Medium–High |
+| **Environment/Config** | Env variable, version mismatch, dependency conflict | Low |
+| **External dependency** | API change, library bug, infrastructure outage | Variable |
 
-**출력:**
+**Output:**
 ```
 🔍 Root Cause Analysis
 
-원인 유형: [로직 에러 / 상태 문제 / ...]
-위치: [파일명:라인] 또는 [모듈/서비스명]
-설명: [왜 이 코드가 문제인지 구체적으로]
-증거: [재현 테스트, 로그, 코드 경로]
+Cause type: [Logic error / State issue / ...]
+Location: [filename:line] or [module/service name]
+Description: [Why this code is the problem, specifically]
+Evidence: [Reproduction test, logs, code path]
 ```
 
-### Step 4: 수정 범위 결정
+### Step 4: Determine Fix Scope
 
-근본 원인을 파악한 후, 수정이 미치는 범위를 평가합니다.
+After identifying the root cause, assess the scope of the fix.
 
-- [ ] 이 수정이 다른 기능에 영향을 주는가?
-- [ ] 같은 패턴의 버그가 다른 곳에도 있는가? (Shotgun Fix 필요?)
-- [ ] 수정이 API 계약이나 데이터 구조를 변경하는가?
+- [ ] Does this fix affect other features?
+- [ ] Does the same bug pattern exist elsewhere? (Shotgun Fix needed?)
+- [ ] Does the fix change an API contract or data structure?
 
-**범위에 따른 분류:**
+**Classification by scope:**
 
-| 범위 | 기준 | 접근 |
-|------|------|------|
-| **Isolated** | 단일 파일/함수, 다른 곳에 영향 없음 | 바로 수정 |
-| **Spreading** | 같은 패턴이 여러 곳에 존재 | 모든 발생 지점 목록화 후 일괄 수정 |
-| **Structural** | 설계 결함이 원인, 리팩터링 필요 | Plan 수립 후 수정 (full-dev-cycle 전환 검토) |
+| Scope | Criteria | Approach |
+|-------|----------|----------|
+| **Isolated** | Single file/function, no impact elsewhere | Fix immediately |
+| **Spreading** | Same pattern exists in multiple places | List all occurrences, batch fix |
+| **Structural** | Design flaw is the cause, refactoring needed | Create plan first (consider switching to full-dev-cycle) |
 
 ## Constraints
-- 재현 없이 수정하지 않음 — "아마 이게 원인일 것이다"로 코드를 바꾸지 않음
-- 증상 수정(Symptom Fix)이 아닌 근본 원인 수정(Root Fix)을 목표
-- 수정 범위가 Structural이면 사용자에게 알리고 full-dev-cycle 전환 권장
+- Do not fix without reproduction — do not change code based on "this is probably the cause"
+- Target root cause fix (Root Fix), not symptom fix (Symptom Fix)
+- If fix scope is Structural, notify the user and recommend switching to full-dev-cycle

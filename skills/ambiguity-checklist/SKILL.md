@@ -1,205 +1,205 @@
 ---
 name: ambiguity-checklist
 description: |
-  사용자 요구사항의 모호성을 체계적으로 점검하는 체크리스트.
-  새로운 기능 요청, 스펙 정의, 요구사항 분석, API 설계 요청 시 사용.
-  트리거: "기능 요청", "스펙 작성", "요구사항 분석", "설계 시작"
+  Systematic checklist for identifying ambiguities in user requirements.
+  Used for new feature requests, spec definitions, requirements analysis, and API design.
+  Triggers: "feature request", "spec writing", "requirements analysis", "start design"
 ---
 
 # Ambiguity Checklist
 
 ## Goal
-요구사항이 "Implementable" 수준인지 판정합니다.
-모호한 부분은 사용자에게 구체적인 선택지를 제시하여 해소합니다.
+Determine whether requirements are at an "Implementable" level.
+Resolve ambiguities by presenting specific options to the user.
 
 ## Instructions
 
-### Step 1: 위험도 분류
-먼저 요청의 위험도를 판정합니다. 위험도에 따라 점검 깊이가 달라집니다.
+### Step 1: Risk Classification
+First, determine the risk level of the request. Inspection depth varies by risk level.
 
-| 위험도 | 기준 | 필수 점검 항목 |
-|--------|------|---------------|
-| **Critical** | 결제, 인증, 개인정보, 금융 데이터 관련 | 6개 전부 필수 |
-| **Standard** | 일반 비즈니스 기능, API CRUD | 1~4 필수, 5~6 권장 |
-| **Low** | UI 텍스트 변경, 설정값 조정, 문서 수정 | 4만 필수, 나머지 스킵 가능 |
+| Risk Level | Criteria | Required Checks |
+|------------|----------|-----------------|
+| **Critical** | Payment, authentication, personal data, financial data | All 6 mandatory |
+| **Standard** | General business features, API CRUD | 1–4 mandatory, 5–6 recommended |
+| **Low** | UI text changes, config adjustments, doc edits | Only 4 mandatory, rest can be skipped |
 
-### Step 2: 항목별 심층 점검
+### Step 2: Detailed Inspection per Item
 
-각 항목을 아래 가이드에 따라 점검합니다.
-항목이 모호하면 **"선택지 질문"** 형태로 사용자에게 제시합니다.
-(열린 질문 "어떻게 할까요?" 대신, 구체적 옵션 A/B/C를 제시)
-
----
-
-#### 1. Error Scenarios (실패 모드)
-**점검**: 이 기능에서 발생 가능한 외부 실패를 모두 식별했는가?
-
-**세부 체크**:
-- [ ] 네트워크 장애 시 동작 (타임아웃, 재시도, fallback)
-- [ ] 외부 API/서비스 다운 시 동작
-- [ ] DB 연결 실패 / 쿼리 타임아웃 시 동작
-- [ ] 입력 데이터 유효성 실패 시 에러 응답 형식
-- [ ] 부분 실패 시 동작 (10개 중 3개만 성공하면?)
-
-**충족 기준**: 각 실패에 대해 "어떤 HTTP 코드 + 어떤 메시지 + 어떤 후속 동작"이 정의됨
-
-**미충족 시 질문 예시**:
-```
-외부 결제 API가 타임아웃되면 어떻게 처리할까요?
-  A) 3회 재시도 후 실패 응답 (사용자에게 "잠시 후 다시 시도")
-  B) 즉시 실패 + 관리자 알림
-  C) 대기열에 넣고 백그라운드 재시도
-```
+Inspect each item following the guide below.
+If an item is ambiguous, present it to the user as a **"multiple-choice question"**.
+(Instead of open-ended "How should we handle this?", present specific options A/B/C)
 
 ---
 
-#### 2. Input Constraints (입력 제한)
-**점검**: 모든 입력 필드의 경계값이 정의되었는가?
+#### 1. Error Scenarios (Failure Modes)
+**Check**: Have all possible external failures for this feature been identified?
 
-**세부 체크**:
-- [ ] 각 필드의 타입 (string, number, enum, file 등)
-- [ ] 각 필드의 필수/선택 여부
-- [ ] 문자열: 최소/최대 길이, 허용 문자 (한글? 특수문자? 이모지?)
-- [ ] 숫자: 최소/최대 값, 소수점 허용 여부
-- [ ] 파일: 최대 크기, 허용 형식, 동시 업로드 수
-- [ ] 배열/리스트: 최소/최대 항목 수, 중복 허용 여부
+**Detailed checklist**:
+- [ ] Behavior on network failure (timeout, retry, fallback)
+- [ ] Behavior when external API/service is down
+- [ ] Behavior on DB connection failure / query timeout
+- [ ] Error response format on input validation failure
+- [ ] Behavior on partial failure (what if only 3 out of 10 succeed?)
 
-**충족 기준**: 각 입력 필드에 대해 DTO/Schema로 변환 가능한 수준의 구체적 제약
+**Pass criteria**: For each failure, "which HTTP code + which message + which follow-up action" is defined
 
-**미충족 시 질문 예시**:
+**Example question if not met**:
 ```
-사용자 닉네임 필드의 제약을 정해주세요:
-  - 최소 길이: 2자? 3자?
-  - 최대 길이: 20자? 30자?
-  - 허용 문자: A) 영문+숫자만  B) 한글 포함  C) 특수문자 포함  D) 이모지 포함
-  - 중복 허용: A) 중복 불가 (unique)  B) 중복 허용
+What should happen when the external payment API times out?
+  A) Retry 3 times, then return failure response ("Please try again later")
+  B) Fail immediately + notify admin
+  C) Queue it for background retry
 ```
 
 ---
 
-#### 3. Auth/Permission (접근 권한)
-**점검**: 누가 이 기능을 사용할 수 있고, 누가 사용할 수 없는가?
+#### 2. Input Constraints
+**Check**: Are boundary values defined for all input fields?
 
-**세부 체크**:
-- [ ] 인증 필요 여부 (비로그인 사용자 접근 가능?)
-- [ ] 역할별 접근 범위 (Admin / Manager / User / Guest)
-- [ ] 리소스 소유권 (본인 데이터만? 같은 팀? 전체?)
-- [ ] 특수 권한 (슈퍼어드민 오버라이드, 위임 등)
+**Detailed checklist**:
+- [ ] Type of each field (string, number, enum, file, etc.)
+- [ ] Required vs optional for each field
+- [ ] Strings: min/max length, allowed characters (Unicode? special chars? emoji?)
+- [ ] Numbers: min/max value, decimal allowed?
+- [ ] Files: max size, allowed formats, concurrent upload count
+- [ ] Arrays/Lists: min/max item count, duplicates allowed?
 
-**충족 기준**: 역할 × 액션 매트릭스로 표현 가능한 수준
+**Pass criteria**: Constraints specific enough to be converted to a DTO/Schema for each input field
 
-**미충족 시 질문 예시**:
+**Example question if not met**:
 ```
-이 API의 접근 권한을 정해주세요:
-
-| 역할 | 생성 | 조회 | 수정 | 삭제 |
-|------|------|------|------|------|
-| Admin | ? | ? | ? | ? |
-| User  | ? | ? | ? | ? |
-| Guest | ? | ? | ? | ? |
-
-특히:
-- User가 다른 User의 데이터를 조회할 수 있나요?
-  A) 본인 것만  B) 같은 팀 내  C) 전체 공개
+Please define constraints for the username field:
+  - Min length: 2 chars? 3 chars?
+  - Max length: 20 chars? 30 chars?
+  - Allowed characters: A) Alphanumeric only  B) Include Unicode  C) Include special chars  D) Include emoji
+  - Uniqueness: A) Must be unique  B) Duplicates allowed
 ```
 
 ---
 
-#### 4. Business Logic (성공 기준)
-**점검**: "이 기능이 성공했다"를 어떻게 판단하는가?
+#### 3. Auth/Permission (Access Control)
+**Check**: Who can use this feature, and who cannot?
 
-**세부 체크**:
-- [ ] 핵심 성공 시나리오 (Happy Path) 명확
-- [ ] 비즈니스 규칙 (조건부 로직) 명시
-- [ ] 상태 전이가 있다면 전이 규칙 정의
-- [ ] 부수 효과 (Side Effects): 알림, 로그, 이벤트 발행 등
-- [ ] 멱등성: 같은 요청 2번 보내면 결과가 어떻게 되는가?
+**Detailed checklist**:
+- [ ] Authentication required? (Can unauthenticated users access it?)
+- [ ] Access scope per role (Admin / Manager / User / Guest)
+- [ ] Resource ownership (Own data only? Same team? Everyone?)
+- [ ] Special permissions (Super admin override, delegation, etc.)
 
-**충족 기준**: Given-When-Then 형태로 시나리오를 작성할 수 있는 수준
+**Pass criteria**: Expressible as a Role × Action matrix
 
-**미충족 시 질문 예시**:
+**Example question if not met**:
 ```
-주문 취소 시 비즈니스 규칙을 확인합니다:
-- 취소 가능 시점: A) 배송 전까지  B) 결제 후 24시간 이내  C) 항상 가능
-- 환불 방식: A) 즉시 전액 환불  B) 부분 환불(수수료 차감)  C) 포인트 전환
-- 취소 후 재고: A) 즉시 복구  B) 검수 후 복구
-- 알림: A) 이메일  B) 푸시  C) SMS  D) 없음
-```
+Please define access permissions for this API:
 
----
+| Role  | Create | Read | Update | Delete |
+|-------|--------|------|--------|--------|
+| Admin | ?      | ?    | ?      | ?      |
+| User  | ?      | ?    | ?      | ?      |
+| Guest | ?      | ?    | ?      | ?      |
 
-#### 5. Performance (성능 요건) — Standard 이상 필수
-**점검**: 예상 부하와 응답 시간 요건이 정의되었는가?
-
-**세부 체크**:
-- [ ] 예상 동시 사용자 수 / 초당 요청 수 (TPS)
-- [ ] 응답 시간 목표 (p50, p95, p99)
-- [ ] 데이터 크기 예상 (1년 후 테이블 행 수)
-- [ ] 페이지네이션 / 무한스크롤 필요 여부
-
-**충족 기준**: 구체적 숫자가 있거나, "현재는 소규모라 성능 최적화 불필요" 같은 명시적 판단
-
-**미충족 시 질문 예시**:
-```
-성능 요건을 정해주세요:
-- 예상 사용자 규모: A) 소규모 (<100명)  B) 중규모 (<10,000명)  C) 대규모 (10,000+)
-- 이에 따라 캐싱, 페이지네이션, 인덱싱 전략이 달라집니다.
-- 현재 단계에서 성능 최적화가 불필요하다면 "스킵"이라고 말씀해주세요.
+Specifically:
+- Can a User view another User's data?
+  A) Own data only  B) Within same team  C) Publicly visible
 ```
 
 ---
 
-#### 6. Idempotency (멱등성) — Critical 필수
-**점검**: 동일 요청이 중복 실행되어도 안전한가?
+#### 4. Business Logic (Success Criteria)
+**Check**: How do we determine "this feature succeeded"?
 
-**세부 체크**:
-- [ ] 네트워크 재시도로 인한 중복 요청 처리
-- [ ] Idempotency Key 필요 여부
-- [ ] 중복 생성 방지 (unique 제약 / dedup 로직)
-- [ ] 결제/포인트 등 금액 관련 중복 차감 방지
+**Detailed checklist**:
+- [ ] Core success scenario (Happy Path) is clear
+- [ ] Business rules (conditional logic) are specified
+- [ ] State transition rules are defined, if applicable
+- [ ] Side Effects: notifications, logs, event publishing, etc.
+- [ ] Idempotency: what happens if the same request is sent twice?
 
-**충족 기준**: "이 API를 같은 파라미터로 2번 호출하면 X가 된다"가 명확
+**Pass criteria**: Scenarios can be written in Given-When-Then format
 
-**미충족 시 질문 예시**:
+**Example question if not met**:
 ```
-이 API가 네트워크 문제로 2번 호출되면:
-  A) 같은 결과 반환 (멱등) — Idempotency Key 사용
-  B) 2개가 생성됨 (비멱등) — 허용 가능
-  C) 2번째는 409 Conflict 에러
+Confirming business rules for order cancellation:
+- Cancel deadline: A) Before shipping  B) Within 24 hours of payment  C) Always allowed
+- Refund method: A) Immediate full refund  B) Partial refund (fees deducted)  C) Convert to points
+- Inventory after cancel: A) Immediate restore  B) Restore after inspection
+- Notification: A) Email  B) Push  C) SMS  D) None
 ```
 
 ---
 
-### Step 3: 종합 판정
+#### 5. Performance (Performance Requirements) — Required for Standard+
+**Check**: Are expected load and response time requirements defined?
 
-모든 필수 항목 점검 후 판정합니다:
+**Detailed checklist**:
+- [ ] Expected concurrent users / requests per second (TPS)
+- [ ] Response time targets (p50, p95, p99)
+- [ ] Expected data size (table row count after 1 year)
+- [ ] Pagination / infinite scroll needed?
 
-| 상태 | 조건 | 행동 |
-|------|------|------|
-| ✅ **Implementable** | 위험도별 필수 항목 모두 충족 | 설계 진행 |
-| ⚠️ **Conditionally OK** | 1~2개 미충족이나 합리적 기본값 존재 | 기본값 제안 후 사용자 확인 |
-| ❌ **Not Ready** | 핵심 항목 미충족 | 질문 제시, 설계 시작 금지 |
+**Pass criteria**: Specific numbers exist, or an explicit decision like "small scale, no performance optimization needed"
 
-### Step 4: 판정 결과 출력 형식
+**Example question if not met**:
+```
+Please define performance requirements:
+- Expected user scale: A) Small (<100)  B) Medium (<10,000)  C) Large (10,000+)
+- Caching, pagination, and indexing strategies depend on this.
+- If performance optimization is unnecessary at this stage, say "skip".
+```
+
+---
+
+#### 6. Idempotency — Required for Critical
+**Check**: Is it safe if the same request is executed multiple times?
+
+**Detailed checklist**:
+- [ ] Handling duplicate requests from network retries
+- [ ] Need for Idempotency Key
+- [ ] Duplicate creation prevention (unique constraint / dedup logic)
+- [ ] Preventing duplicate deductions for payment/points
+
+**Pass criteria**: "If this API is called twice with the same parameters, X happens" is clear
+
+**Example question if not met**:
+```
+If this API is called twice due to network issues:
+  A) Returns the same result (idempotent) — use Idempotency Key
+  B) Two items are created (non-idempotent) — acceptable
+  C) Second call returns 409 Conflict error
+```
+
+---
+
+### Step 3: Final Verdict
+
+After inspecting all required items, make a verdict:
+
+| Status | Condition | Action |
+|--------|-----------|--------|
+| ✅ **Implementable** | All required items for the risk level are met | Proceed with design |
+| ⚠️ **Conditionally OK** | 1–2 items unmet but reasonable defaults exist | Propose defaults, get user confirmation |
+| ❌ **Not Ready** | Core items unmet | Present questions, do not start design |
+
+### Step 4: Verdict Output Format
 
 ```
 📋 Ambiguity Check Result: [✅ Implementable / ⚠️ Conditionally OK / ❌ Not Ready]
-위험도: [Critical / Standard / Low]
+Risk Level: [Critical / Standard / Low]
 
-✅ Error Scenarios: 타임아웃 3회 재시도, 실패 시 503 반환
-✅ Input Constraints: 닉네임 2~20자, 영문+한글+숫자
-⚠️ Auth/Permission: 기본값 적용 — 본인 데이터만 접근 (확인 필요)
-✅ Business Logic: Given-When-Then 3개 시나리오 확인
-⏭️ Performance: 소규모 — 스킵
-⏭️ Idempotency: Standard 위험도 — 스킵
+✅ Error Scenarios: 3 retries on timeout, return 503 on failure
+✅ Input Constraints: Username 2–20 chars, alphanumeric + Unicode
+⚠️ Auth/Permission: Default applied — own data access only (confirmation needed)
+✅ Business Logic: 3 Given-When-Then scenarios confirmed
+⏭️ Performance: Small scale — skipped
+⏭️ Idempotency: Standard risk level — skipped
 
-미해결 질문:
-1. User가 다른 User 프로필을 조회할 수 있나요? (A/B/C)
+Unresolved Questions:
+1. Can a User view another User's profile? (A/B/C)
 ```
 
 ## Constraints
-- 열린 질문("어떻게 할까요?") 대신 **선택지 질문**(A/B/C)을 사용
-- 위험도 Low여도 Business Logic(항목 4)은 반드시 점검
-- 사용자가 "스킵" 또는 "나중에"라고 하면, 해당 항목을 ⏭️로 마킹하고 진행
-- 한 번에 질문은 최대 3개까지만 (질문 폭탄 방지)
-- 질문 3개 → 답변 → 추가 질문 → 답변 → ... 루프
+- Use **multiple-choice questions** (A/B/C) instead of open-ended questions ("How should we handle this?")
+- Even at Low risk, Business Logic (item 4) must always be checked
+- If the user says "skip" or "later", mark the item as ⏭️ and proceed
+- Maximum 3 questions at a time (prevent question overload)
+- 3 questions → answers → follow-up questions → answers → ... loop

@@ -1,80 +1,80 @@
 ---
 name: ui-ux-review
 description: |
-  UI/UX 관점에서 사용성, 시각적 일관성, 반응형 디자인을 점검하는 스킬.
-  프론트엔드 코드 변경, 컴포넌트 추가, 페이지 레이아웃 수정 시 사용.
-  트리거: "UI 리뷰", "UX 점검", "디자인 리뷰", "ui review"
+  Skill for reviewing usability, visual consistency, and responsive design from a UI/UX perspective.
+  Used for frontend code changes, component additions, and page layout modifications.
+  Triggers: "UI review", "UX check", "design review", "ui review"
 ---
 
 # UI/UX Review
 
 ## Goal
-변경된 UI가 사용성 원칙을 준수하고,
-시각적으로 일관되며, 다양한 화면에서 올바르게 동작하는지 점검합니다.
+Verify that changed UI adheres to usability principles,
+is visually consistent, and works correctly across different screens.
 
 ## Instructions
 
-### Step 1: 변경 범위 파악
+### Step 1: Identify Change Scope
 
-- 변경된 컴포넌트/페이지 목록 확인
-- 신규 컴포넌트 vs 기존 컴포넌트 수정 구분
-- 디자인 시스템(토큰, 컴포넌트 라이브러리)이 있는지 확인
+- Check the list of changed components/pages
+- Distinguish new components vs modifications to existing components
+- Check if a design system (tokens, component library) exists
 
-### Step 2: 사용성 휴리스틱 (Nielsen's 10)
+### Step 2: Usability Heuristics (Nielsen's 10)
 
-해당 항목만 점검합니다:
+Inspect only applicable items:
 
-- [ ] **시스템 상태 가시성**: 로딩 중, 처리 중 등 현재 상태를 사용자에게 보여주는가?
-- [ ] **실세계 일치**: 용어, 아이콘, 흐름이 사용자의 기대와 일치하는가?
-- [ ] **사용자 제어**: 실수를 되돌릴 수 있는가? (취소, 뒤로 가기)
-- [ ] **일관성**: 같은 동작에 같은 UI 패턴을 사용하는가?
-- [ ] **에러 예방**: 실수를 유발하기 쉬운 UI가 없는가? (위험 동작에 확인 모달 등)
-- [ ] **에러 복구**: 에러 메시지가 문제와 해결 방법을 명확히 안내하는가?
-- [ ] **빈 상태**: 데이터가 없을 때 적절한 빈 상태 UI가 있는가?
+- [ ] **System status visibility**: Is the current state shown to the user (loading, processing, etc.)?
+- [ ] **Real-world match**: Do terms, icons, and flow match user expectations?
+- [ ] **User control**: Can mistakes be undone? (cancel, back navigation)
+- [ ] **Consistency**: Are the same UI patterns used for the same actions?
+- [ ] **Error prevention**: Are there UIs that easily lead to mistakes? (confirmation modals for dangerous actions, etc.)
+- [ ] **Error recovery**: Do error messages clearly state the problem and solution?
+- [ ] **Empty state**: Is there appropriate empty state UI when no data exists?
 
-### Step 3: 시각적 일관성
+### Step 3: Visual Consistency
 
-- [ ] **디자인 토큰 준수**: 색상, 폰트, 간격이 디자인 시스템 토큰을 사용하는가?
-  - 하드코딩된 `#ff0000` 대신 `var(--color-error)` 사용
-- [ ] **타이포그래피**: 폰트 크기/무게 계층이 일관적인가?
-- [ ] **간격**: 마진/패딩이 일관된 스케일을 따르는가? (4px, 8px, 16px...)
-- [ ] **아이콘/이미지**: 프로젝트의 아이콘 세트를 사용하는가? 크기 일관성?
-- [ ] **컴포넌트 재사용**: 기존 컴포넌트가 있는데 새로 만들지 않았는가?
+- [ ] **Design token compliance**: Do colors, fonts, spacing use design system tokens?
+  - Use `var(--color-error)` instead of hardcoded `#ff0000`
+- [ ] **Typography**: Is the font size/weight hierarchy consistent?
+- [ ] **Spacing**: Do margins/paddings follow a consistent scale? (4px, 8px, 16px...)
+- [ ] **Icons/Images**: Are they using the project's icon set? Consistent sizing?
+- [ ] **Component reuse**: Is an existing component available but a new one was created instead?
 
-### Step 4: 인터랙션 패턴
+### Step 4: Interaction Patterns
 
-- [ ] **로딩 표시**: API 호출 중 로딩 상태가 있는가? (스피너, 스켈레톤)
-- [ ] **낙관적 업데이트**: 필요한 곳에 적용되어 있는가?
-- [ ] **폼 검증**: 실시간 검증 + 제출 시 검증이 모두 있는가?
-- [ ] **피드백**: 성공/실패 동작 후 사용자에게 피드백이 있는가? (토스트, 알림)
-- [ ] **트랜지션**: 상태 변화에 적절한 애니메이션/트랜지션이 있는가?
+- [ ] **Loading indicators**: Is there a loading state during API calls? (spinner, skeleton)
+- [ ] **Optimistic updates**: Applied where needed?
+- [ ] **Form validation**: Are both real-time validation and submit-time validation present?
+- [ ] **Feedback**: Is there user feedback after success/failure actions? (toast, notification)
+- [ ] **Transitions**: Are there appropriate animations/transitions for state changes?
 
-### Step 5: 반응형 디자인
+### Step 5: Responsive Design
 
-- [ ] **브레이크포인트**: 주요 브레이크포인트에서 레이아웃이 적절한가?
+- [ ] **Breakpoints**: Is the layout appropriate at major breakpoints?
   - Mobile (< 768px), Tablet (768-1024px), Desktop (> 1024px)
-- [ ] **터치 타겟**: 모바일에서 터치 영역이 충분한가? (최소 44x44px)
-- [ ] **콘텐츠 overflow**: 긴 텍스트, 긴 목록이 적절히 처리되는가? (말줄임, 스크롤)
-- [ ] **이미지**: 반응형 이미지를 사용하는가? (srcset 또는 next/image 등)
+- [ ] **Touch targets**: Are touch areas sufficient on mobile? (minimum 44x44px)
+- [ ] **Content overflow**: Are long text and long lists handled properly? (truncation, scrolling)
+- [ ] **Images**: Are responsive images used? (srcset or next/image, etc.)
 
-### Step 6: 결과 보고
+### Step 6: Report Results
 
 ```
 🎨 UI/UX Review
 
-🔴 Critical (사용 불가 수준):
-  - [컴포넌트] 유형: 설명 → 수정 방안
+🔴 Critical (Unusable):
+  - [Component] Type: Description → Fix
 
-🟠 Warning (사용성 저하):
-  - [컴포넌트] 유형: 설명 → 수정 방안
+🟠 Warning (Reduced usability):
+  - [Component] Type: Description → Fix
 
-🟡 Suggestion (개선 권장):
-  - [컴포넌트] 유형: 설명 → 개선 방안
+🟡 Suggestion (Improvement recommended):
+  - [Component] Type: Description → Improvement
 
-판정: ✅ PASS / ❌ FAIL (🔴 Critical 1건 이상이면 FAIL)
+Verdict: ✅ PASS / ❌ FAIL (FAIL if 🔴 Critical ≥ 1)
 ```
 
 ## Constraints
-- 디자인 시스템이 있으면 반드시 따름 — 임의 스타일 사용 금지
-- 브라우저 도구로 실제 렌더링 확인을 우선
-- 주관적 미적 판단은 하지 않음 — 사용성과 일관성만 점검
+- If a design system exists, always follow it — no arbitrary styling
+- Prioritize verifying actual rendering with browser tools
+- Do not make subjective aesthetic judgments — inspect only usability and consistency

@@ -1,82 +1,82 @@
 ---
 name: security-review
 description: |
-  변경된 코드의 보안 취약점을 OWASP 기반으로 점검하는 스킬.
-  코드 리뷰, QA, 외부 입력 처리 코드 변경 시 사용.
-  트리거: "보안 점검", "보안 리뷰", "security review", "취약점 점검"
+  Skill for checking security vulnerabilities in changed code based on OWASP.
+  Used for code reviews, QA, and external input handling code changes.
+  Triggers: "security check", "security review", "vulnerability check"
 ---
 
 # Security Review
 
 ## Goal
-변경된 코드에 보안 취약점이 없는지 점검하고,
-구체적인 수정 방안을 제시합니다.
+Verify that changed code has no security vulnerabilities and
+provide specific remediation recommendations.
 
 ## Instructions
 
-### Step 1: 보안 범위 판별
+### Step 1: Determine Security Scope
 
-변경 코드가 아래 영역에 해당하는지 확인합니다.
-**해당 영역만 점검합니다** (불필요한 점검 방지).
+Check whether the changed code falls into the areas below.
+**Only inspect applicable areas** (prevent unnecessary checks).
 
-| 영역 | 해당 조건 | 점검 대상 |
-|------|----------|----------|
-| **입력 처리** | 사용자/외부 입력을 받는 코드 | Step 2 |
-| **인증/인가** | 로그인, 권한, 토큰, 세션 관련 | Step 3 |
-| **데이터 보호** | 개인정보, 민감 데이터, 시크릿 | Step 4 |
-| **인프라/설정** | Docker, 환경 변수, CORS, 헤더 | Step 5 |
+| Area | Applicable when | Check target |
+|------|-----------------|-------------|
+| **Input handling** | Code that accepts user/external input | Step 2 |
+| **Auth/AuthZ** | Login, permissions, tokens, sessions | Step 3 |
+| **Data protection** | Personal data, sensitive data, secrets | Step 4 |
+| **Infrastructure/Config** | Docker, env variables, CORS, headers | Step 5 |
 
-### Step 2: 입력 검증 (Injection)
+### Step 2: Input Validation (Injection)
 
-- [ ] **SQL Injection**: 문자열 연결로 쿼리 생성하고 있지 않은가? → Parameterized Query 사용
-- [ ] **XSS**: 사용자 입력을 HTML에 그대로 렌더링하지 않는가? → 이스케이핑/새니타이징
-- [ ] **Command Injection**: 외부 입력이 OS 명령에 포함되지 않는가?
-- [ ] **Path Traversal**: 파일 경로에 사용자 입력이 직접 사용되지 않는가?
-- [ ] **Deserialization**: 신뢰할 수 없는 데이터를 역직렬화하지 않는가?
-- [ ] **입력 검증 위치**: 서버 사이드에서 검증하는가? (클라이언트만으로 불충분)
+- [ ] **SQL Injection**: Is the query built by string concatenation? → Use Parameterized Query
+- [ ] **XSS**: Is user input rendered as-is in HTML? → Escape/sanitize
+- [ ] **Command Injection**: Is external input included in OS commands?
+- [ ] **Path Traversal**: Is user input used directly in file paths?
+- [ ] **Deserialization**: Is untrusted data being deserialized?
+- [ ] **Validation location**: Is validation done server-side? (client-only is insufficient)
 
-### Step 3: 인증/인가 (Auth)
+### Step 3: Authentication/Authorization (Auth)
 
-- [ ] **인증 우회**: 인증 없이 접근 가능한 엔드포인트가 있지 않은가?
-- [ ] **권한 검사**: 리소스 접근 시 소유자/권한을 확인하는가? (IDOR 방지)
-- [ ] **토큰 관리**: JWT 서명 검증, 만료 시간 설정, 갱신 토큰 관리가 적절한가?
-- [ ] **비밀번호**: 평문 저장 없이 적절한 해싱(bcrypt/argon2)을 사용하는가?
-- [ ] **세션 관리**: 세션 고정 공격, 세션 하이재킹 방어가 되어 있는가?
+- [ ] **Auth bypass**: Are there endpoints accessible without authentication?
+- [ ] **Permission check**: Is owner/permission verified on resource access? (IDOR prevention)
+- [ ] **Token management**: Are JWT signature validation, expiry, refresh token management adequate?
+- [ ] **Passwords**: Stored with proper hashing (bcrypt/argon2), not plaintext?
+- [ ] **Session management**: Are session fixation and session hijacking defenses in place?
 
-### Step 4: 데이터 보호 (Secrets & PII)
+### Step 4: Data Protection (Secrets & PII)
 
-- [ ] **하드코딩된 시크릿**: API 키, 비밀번호, 토큰이 코드에 직접 있지 않은가?
-- [ ] **로그 노출**: 비밀번호, 토큰, 개인정보가 로그에 출력되지 않는가?
-- [ ] **에러 메시지**: 스택 트레이스나 내부 경로가 사용자에게 노출되지 않는가?
-- [ ] **전송 보안**: 민감 데이터가 HTTPS로 전송되는가?
-- [ ] **저장 보안**: 민감 데이터가 암호화되어 저장되는가?
+- [ ] **Hardcoded secrets**: Are API keys, passwords, tokens not hardcoded in source?
+- [ ] **Log exposure**: Are passwords, tokens, PII not printed in logs?
+- [ ] **Error messages**: Are stack traces or internal paths not exposed to users?
+- [ ] **Transport security**: Is sensitive data transmitted over HTTPS?
+- [ ] **Storage security**: Is sensitive data encrypted at rest?
 
-### Step 5: 인프라/설정 (Configuration)
+### Step 5: Infrastructure/Configuration
 
-- [ ] **CORS**: 허용 Origin이 `*`로 설정되어 있지 않은가?
-- [ ] **보안 헤더**: `X-Content-Type-Options`, `X-Frame-Options`, CSP가 설정되어 있는가?
-- [ ] **민감 포트**: 디버그 포트, DB 포트가 외부에 노출되지 않는가?
-- [ ] **의존성 취약점**: 알려진 CVE가 있는 라이브러리를 사용하고 있지 않은가?
+- [ ] **CORS**: Is the allowed Origin not set to `*`?
+- [ ] **Security headers**: Are `X-Content-Type-Options`, `X-Frame-Options`, CSP configured?
+- [ ] **Exposed ports**: Are debug ports, DB ports not exposed externally?
+- [ ] **Dependency vulnerabilities**: Are any libraries with known CVEs in use?
 
-### Step 6: 결과 보고
+### Step 6: Report Results
 
 ```
 🔒 Security Review
 
-점검 범위: [입력 처리 / 인증 / 데이터 보호 / 인프라] 중 해당 영역
+Reviewed areas: [Input handling / Auth / Data protection / Infra] applicable areas
 
-🔴 Critical (즉시 수정 필수):
-  - [파일:라인] 취약점 유형: 설명 → 수정 방안
+🔴 Critical (Must fix immediately):
+  - [file:line] Vulnerability type: Description → Remediation
 
-🟠 Warning (수정 권장):
-  - [파일:라인] 취약점 유형: 설명 → 수정 방안
+🟠 Warning (Fix recommended):
+  - [file:line] Vulnerability type: Description → Remediation
 
-✅ 점검 완료: 발견 없음 / N건 발견
+✅ Review complete: No findings / N finding(s)
 
-판정: ✅ PASS / ❌ FAIL (🔴 Critical 1건 이상이면 FAIL)
+Verdict: ✅ PASS / ❌ FAIL (FAIL if 🔴 Critical ≥ 1)
 ```
 
 ## Constraints
-- 해당 영역만 점검 — 변경과 무관한 영역은 건너뜀
-- 🔴 Critical 1건이라도 있으면 FAIL → 수정 후 재점검
-- 보안 수정은 기능 테스트 후 적용 (보안 패치가 기능을 깨뜨리지 않도록)
+- Only inspect applicable areas — skip areas unrelated to the change
+- 🔴 Critical even 1 means FAIL → re-inspect after fix
+- Apply security fixes after functional testing (ensure security patches don't break functionality)

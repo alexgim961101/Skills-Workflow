@@ -1,75 +1,75 @@
 ---
 name: impact-analysis
 description: |
-  코드베이스 또는 인프라의 변경 영향 범위를 체계적으로 분석하는 스킬.
-  새 기능 추가, 리팩터링, 인프라 변경, DB 마이그레이션 등 변경 작업 전에 사용.
-  트리거: "영향 분석", "변경 범위", "impact analysis", "리스크 분석"
+  Skill for systematically analyzing the blast radius of changes in a codebase or infrastructure.
+  Used before adding new features, refactoring, infra changes, DB migrations, and other modifications.
+  Triggers: "impact analysis", "change scope", "blast radius", "risk analysis"
 ---
 
 # Impact Analysis
 
 ## Goal
-변경 작업 전에 영향 범위와 잠재적 리스크를 사전에 파악합니다.
-"어디까지 영향을 주는가?"를 정량적으로 답할 수 있는 수준까지 분석합니다.
+Identify the blast radius and potential risks before making changes.
+Analyze to the level where "how far does this affect?" can be answered quantitatively.
 
 ## Instructions
 
-### Step 1: 변경 대상 식별
+### Step 1: Identify Change Targets
 
-변경 요청에서 직접적으로 수정이 필요한 파일/리소스를 나열합니다.
+List the files/resources that directly require modification from the change request.
 
-- **코드 변경 시**: 관련 모듈, 서비스, 엔드포인트, DB 스키마 스캔
-- **인프라 변경 시**: 대상 리소스(K8s, DB, 네트워크, 스토리지 등) 식별
-- **출력**: 변경 대상 파일/리소스 목록
+- **Code changes**: Scan related modules, services, endpoints, DB schemas
+- **Infrastructure changes**: Identify target resources (K8s, DB, network, storage, etc.)
+- **Output**: List of files/resources to be changed
 
-### Step 2: 의존성 추적 (Blast Radius)
+### Step 2: Dependency Tracing (Blast Radius)
 
-직접 변경 대상이 아니지만 영향을 받을 수 있는 범위를 추적합니다.
+Trace the scope that may be affected but is not a direct change target.
 
-**코드 변경:**
-- [ ] 이 모듈을 import/호출하는 다른 모듈은?
-- [ ] 변경되는 인터페이스/DTO를 사용하는 곳은?
-- [ ] 관련 테스트 파일은?
-- [ ] 설정 파일(config, env)에 영향이 있는가?
+**Code changes:**
+- [ ] What other modules import/call this module?
+- [ ] Where are the changed interfaces/DTOs used?
+- [ ] What are the related test files?
+- [ ] Are configuration files (config, env) affected?
 
-**인프라 변경:**
-- [ ] 이 리소스에 의존하는 서비스/애플리케이션은?
-- [ ] 네트워크 경로(DNS, LB, 방화벽)에 영향이 있는가?
-- [ ] 다른 환경(dev/stage/prod)에도 전파되는가?
+**Infrastructure changes:**
+- [ ] What services/applications depend on this resource?
+- [ ] Are network paths (DNS, LB, firewall) affected?
+- [ ] Does this propagate to other environments (dev/stage/prod)?
 
-### Step 3: 브레이킹 체인지 판별
+### Step 3: Breaking Change Assessment
 
-아래 기준으로 브레이킹 체인지 여부를 판단합니다.
+Determine whether changes are breaking based on the criteria below.
 
-| 변경 유형 | 브레이킹 여부 | 예시 |
-|-----------|-------------|------|
-| API 시그니처 변경 | ⚠️ 가능 | 파라미터 추가/삭제, 응답 구조 변경 |
-| DB 스키마 변경 | ⚠️ 가능 | 컬럼 삭제, NOT NULL 추가, 타입 변경 |
-| 설정값 변경 | ⚠️ 가능 | 환경 변수 이름 변경, 기본값 변경 |
-| 내부 리팩터링 | ✅ 안전 | 함수 분리, 이름 변경(private), 로직 개선 |
-| 새 파일/엔드포인트 추가 | ✅ 안전 | 기존 코드 수정 없이 추가만 |
+| Change Type | Breaking? | Example |
+|-------------|-----------|---------|
+| API signature change | ⚠️ Possible | Parameter add/remove, response structure change |
+| DB schema change | ⚠️ Possible | Column drop, NOT NULL added, type change |
+| Config value change | ⚠️ Possible | Env variable rename, default value change |
+| Internal refactoring | ✅ Safe | Function split, private rename, logic improvement |
+| New file/endpoint addition | ✅ Safe | Addition only, no existing code modification |
 
-### Step 4: 리스크 요약
+### Step 4: Risk Summary
 
-발견된 사항을 아래 형식으로 정리합니다.
+Summarize findings in the format below.
 
 ```
 📋 Impact Analysis Report
 
-변경 대상: N개 파일/리소스
-영향 범위: M개 파일/서비스 (의존성 포함)
+Change targets: N files/resources
+Blast radius: M files/services (including dependencies)
 
-⚠️ 브레이킹 체인지:
-  - [위치] 변경 내용 → 영향받는 곳
+⚠️ Breaking Changes:
+  - [Location] Change description → Affected areas
 
-🔍 주의 사항:
-  - [리스크 수준: High/Med/Low] 내용
+🔍 Caution:
+  - [Risk level: High/Med/Low] Description
 
-✅ 안전 영역:
-  - 영향 없는 부분 요약
+✅ Safe Areas:
+  - Summary of unaffected areas
 ```
 
 ## Constraints
-- 변경 대상 파일을 직접 확인할 수 있을 때는 반드시 코드를 읽고 분석
-- "아마 괜찮을 것이다" 같은 추측은 하지 않고, 불확실하면 명시
-- 브레이킹 체인지가 있으면 반드시 사용자에게 알림
+- When change target files can be directly accessed, always read and analyze the code
+- Do not make assumptions like "it's probably fine" — state uncertainties explicitly
+- Always notify the user when breaking changes are found

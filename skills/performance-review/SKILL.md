@@ -1,111 +1,111 @@
 ---
 name: performance-review
 description: |
-  코드의 성능 병목을 심층 분석하고 최적화 방안을 제시하는 스킬.
-  성능 민감 코드 변경, 대용량 데이터 처리, 쿼리 최적화 시 사용.
-  트리거: "성능 점검", "성능 리뷰", "performance review", "최적화", "느려요"
+  Skill for deep analysis of code performance bottlenecks and optimization recommendations.
+  Used for performance-sensitive code changes, large data processing, and query optimization.
+  Triggers: "performance check", "performance review", "optimization", "slow", "perf review"
 ---
 
 # Performance Review
 
 ## Goal
-변경된 코드의 성능 병목을 탐지하고,
-측정 가능한 근거와 함께 최적화 방안을 제시합니다.
+Detect performance bottlenecks in changed code and
+provide optimization recommendations with measurable evidence.
 
 ## Instructions
 
-### Step 1: 성능 영향도 판별
+### Step 1: Determine Performance Impact
 
-변경 코드가 아래 영역에 해당하는지 확인합니다.
-**해당 영역만 점검합니다.**
+Check whether the changed code falls into the areas below.
+**Only inspect applicable areas.**
 
-| 영역 | 해당 조건 |
-|------|----------|
-| **알고리즘/자료구조** | 반복문, 정렬, 검색, 대량 데이터 처리 |
-| **데이터베이스** | 쿼리 추가/변경, ORM 사용, 데이터 접근 패턴 |
-| **I/O/네트워크** | 파일 처리, API 호출, 외부 서비스 연동 |
-| **메모리** | 대용량 객체, 캐싱, 컬렉션 조작 |
-| **동시성** | 스레드, 비동기, 락, 커넥션 풀 |
+| Area | Applicable when |
+|------|-----------------|
+| **Algorithm/Data structure** | Loops, sorting, searching, large data processing |
+| **Database** | Query add/change, ORM usage, data access patterns |
+| **I/O/Network** | File processing, API calls, external service integration |
+| **Memory** | Large objects, caching, collection manipulation |
+| **Concurrency** | Threads, async, locks, connection pools |
 
-### Step 2: 알고리즘/자료구조
+### Step 2: Algorithm/Data Structure
 
-- [ ] **시간 복잡도**: 핵심 로직의 Big-O가 적절한가?
-  - 중첩 반복문 → O(n²) 이상이면 개선 가능 여부 확인
-  - 정렬/검색에 적절한 알고리즘을 사용하는가?
-- [ ] **자료구조 선택**: 사용 패턴에 맞는 자료구조를 선택했는가?
-  - 빈번한 검색 → HashMap/Set 사용 여부
-  - 빈번한 삽입/삭제 → LinkedList/Queue 적합성
-  - 중복 검사 → List.contains() 대신 Set 사용
-- [ ] **불필요한 반복**: 같은 데이터를 여러 번 순회하고 있지 않은가?
-  - Stream 체이닝으로 단일 패스 가능 여부
-  - 중간 결과 캐싱 가능 여부
+- [ ] **Time complexity**: Is the Big-O of core logic appropriate?
+  - Nested loops → check if improvement possible when O(n²) or above
+  - Is the appropriate algorithm used for sorting/searching?
+- [ ] **Data structure selection**: Is the data structure appropriate for the usage pattern?
+  - Frequent lookups → HashMap/Set usage?
+  - Frequent inserts/deletes → LinkedList/Queue suitability?
+  - Duplicate checks → Set instead of List.contains()?
+- [ ] **Unnecessary iteration**: Is the same data being iterated multiple times?
+  - Can Stream chaining enable single-pass?
+  - Can intermediate results be cached?
 
-### Step 3: 데이터베이스
+### Step 3: Database
 
-- [ ] **N+1 문제**: 루프 안에서 쿼리를 실행하고 있지 않은가?
-  - ORM의 lazy loading이 N+1을 유발하지 않는가?
-  - → Fetch Join, 배치 쿼리, IN 절로 변경
-- [ ] **인덱스**: WHERE/JOIN/ORDER BY 절의 컬럼에 인덱스가 있는가?
-  - 복합 인덱스의 컬럼 순서가 적절한가?
-- [ ] **쿼리 효율**: 필요한 컬럼만 SELECT하고 있는가? (SELECT * 지양)
-  - 페이지네이션: OFFSET 방식 vs Cursor 방식
-  - 대용량 집계: 앱 레벨 vs DB 레벨
-- [ ] **트랜잭션 범위**: 트랜잭션이 불필요하게 길지 않은가?
-  - 외부 API 호출이 트랜잭션 안에 포함되어 있지 않은가?
+- [ ] **N+1 problem**: Are queries being executed inside a loop?
+  - Does ORM lazy loading cause N+1?
+  - → Change to Fetch Join, batch query, IN clause
+- [ ] **Indexes**: Do columns in WHERE/JOIN/ORDER BY have indexes?
+  - Is the column order in composite indexes appropriate?
+- [ ] **Query efficiency**: Are only needed columns being SELECTed? (avoid SELECT *)
+  - Pagination: OFFSET vs Cursor approach
+  - Large aggregations: app-level vs DB-level
+- [ ] **Transaction scope**: Is the transaction unnecessarily long?
+  - Are external API calls included inside the transaction?
 
-### Step 4: I/O / 네트워크
+### Step 4: I/O / Network
 
-- [ ] **동기 블로킹**: 외부 API 호출이 동기로 실행되고 있는가?
-  - 독립적인 외부 호출은 병렬화 가능 여부
-- [ ] **배치 처리**: 건별 API 호출 대신 배치 API 사용 가능 여부
-- [ ] **재시도/타임아웃**: 외부 호출에 타임아웃과 재시도 정책이 있는가?
-  - 무한 대기 방지
-- [ ] **파일 I/O**: 대용량 파일을 한 번에 메모리에 올리지 않고 스트리밍하는가?
-- [ ] **캐싱**: 동일 요청을 반복 호출하지 않도록 캐싱이 적용되어 있는가?
-  - 캐시 무효화 전략은 적절한가?
+- [ ] **Synchronous blocking**: Are external API calls executing synchronously?
+  - Can independent external calls be parallelized?
+- [ ] **Batch processing**: Can batch APIs be used instead of per-item API calls?
+- [ ] **Retry/Timeout**: Do external calls have timeout and retry policies?
+  - Prevent indefinite waiting
+- [ ] **File I/O**: Are large files streamed instead of loaded entirely into memory?
+- [ ] **Caching**: Is caching applied to avoid repeating identical requests?
+  - Is the cache invalidation strategy appropriate?
 
-### Step 5: 메모리
+### Step 5: Memory
 
-- [ ] **대용량 컬렉션**: 메모리에 전체 결과를 올리지 않고 스트리밍/페이징하는가?
-- [ ] **객체 생명주기**: 루프 안에서 불필요하게 큰 객체를 생성하고 있지 않은가?
-- [ ] **메모리 누수**: 이벤트 리스너, 콜백, 캐시가 정리되고 있는가?
-  - 정적 컬렉션에 무한 축적되는 패턴이 없는가?
-- [ ] **문자열 연결**: 루프 안에서 `+`로 문자열을 반복 연결하지 않는가?
-  - → StringBuilder / StringBuffer / join 사용
+- [ ] **Large collections**: Are results streamed/paged instead of loaded entirely into memory?
+- [ ] **Object lifecycle**: Are unnecessarily large objects created inside loops?
+- [ ] **Memory leaks**: Are event listeners, callbacks, caches being cleaned up?
+  - No patterns of unbounded accumulation in static collections?
+- [ ] **String concatenation**: Are strings not being repeatedly concatenated with `+` inside loops?
+  - → Use StringBuilder / StringBuffer / join
 
-### Step 6: 동시성
+### Step 6: Concurrency
 
-- [ ] **락 경합**: 필요 이상으로 넓은 범위에 락이 걸려 있지 않은가?
-  - 읽기/쓰기 락 분리 가능 여부
-  - 락 없는 자료구조(ConcurrentHashMap 등) 사용 가능 여부
-- [ ] **커넥션 풀**: DB/HTTP 커넥션 풀 크기가 적절한가?
-  - 풀 고갈 시 대기 시간/타임아웃 설정
-- [ ] **스레드 안전성**: 공유 상태에 대한 동기화가 적절한가?
-- [ ] **비동기 누수**: 비동기 작업의 예외가 무시되고 있지 않은가?
+- [ ] **Lock contention**: Are locks held over a wider scope than necessary?
+  - Can read/write locks be separated?
+  - Can lock-free data structures (ConcurrentHashMap, etc.) be used?
+- [ ] **Connection pool**: Are DB/HTTP connection pool sizes appropriate?
+  - Wait time/timeout settings on pool exhaustion
+- [ ] **Thread safety**: Is synchronization appropriate for shared state?
+- [ ] **Async leak**: Are exceptions from async operations being silently ignored?
 
-### Step 7: 결과 보고
+### Step 7: Report Results
 
 ```
 ⚡ Performance Review
 
-점검 범위: [알고리즘 / DB / I/O / 메모리 / 동시성] 중 해당 영역
+Reviewed areas: [Algorithm / DB / I/O / Memory / Concurrency] applicable areas
 
-🔴 Critical (성능 장애 유발 가능):
-  - [파일:라인] 유형: 설명
-    현재: O(n²) 중첩 루프
-    제안: HashMap으로 O(n) 변환 가능
+🔴 Critical (Potential performance failure):
+  - [file:line] Type: Description
+    Current: O(n²) nested loop
+    Suggestion: Can convert to O(n) with HashMap
 
-🟠 Warning (부하 시 병목 예상):
-  - [파일:라인] 유형: 설명 → 개선 방안
+🟠 Warning (Bottleneck expected under load):
+  - [file:line] Type: Description → Improvement
 
-🟡 Suggestion (최적화 권장):
-  - [파일:라인] 유형: 설명 → 개선 방안
+🟡 Suggestion (Optimization recommended):
+  - [file:line] Type: Description → Improvement
 
-판정: ✅ PASS / ❌ FAIL (🔴 Critical 1건 이상이면 FAIL)
+Verdict: ✅ PASS / ❌ FAIL (FAIL if 🔴 Critical ≥ 1)
 ```
 
 ## Constraints
-- 측정 없는 최적화는 추측일 뿐 — 가능하면 벤치마크/프로파일링 근거 제시
-- 조기 최적화 경계 — 실제 병목이 아닌 곳의 미세 최적화는 🟡 Suggestion으로만
-- 가독성과 트레이드오프 — 성능 개선이 가독성을 심각히 저해하면 명시
-- 해당 영역만 점검 — 변경과 무관한 영역은 건너뜀
+- Optimization without measurement is guesswork — provide benchmark/profiling evidence when possible
+- Beware premature optimization — micro-optimizations on non-bottlenecks are 🟡 Suggestion only
+- Readability tradeoff — state explicitly when performance improvement severely hurts readability
+- Only inspect applicable areas — skip areas unrelated to the change

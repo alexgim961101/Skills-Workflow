@@ -1,116 +1,116 @@
 ---
 name: test-strategy
 description: |
-  테스트 전략을 수립하고, 테스트를 작성·실행하며, 테스트 품질까지 점검하는 스킬.
-  신규 기능 테스트, 기존 코드 수정 후 회귀 테스트, 테스트 커버리지 개선 시 사용.
-  트리거: "테스트 작성", "테스트 전략", "test strategy", "회귀 테스트"
+  Skill for defining test strategy, writing/running tests, and verifying test quality.
+  Used for new feature testing, regression testing after code changes, and test coverage improvement.
+  Triggers: "write tests", "test strategy", "regression test", "test plan"
 ---
 
 # Test Strategy
 
 ## Goal
-변경된 코드에 대해 적절한 테스트 전략을 수립하고,
-테스트를 작성·실행하여 품질을 검증합니다.
-**테스트 자체의 품질까지 점검**하여 "통과했지만 의미 없는 테스트"를 방지합니다.
+Define an appropriate test strategy for changed code,
+write and run tests to verify quality.
+**Also verify the quality of the tests themselves** to prevent "tests that pass but are meaningless".
 
 ## Instructions
 
-### Step 1: 변경 유형 판별
+### Step 1: Determine Change Type
 
-변경된 파일을 분석하여 테스트 모드를 결정합니다.
+Analyze changed files to determine the test mode.
 
-| 상황 | 모드 | 접근법 |
-|------|------|--------|
-| 새 파일, 기존 테스트 없음 | **Mode A: New** | 테스트를 새로 작성 |
-| 기존 파일 수정, 테스트 존재 | **Mode B: Update** | 기존 테스트 업데이트 + 새 케이스 추가 |
-| 리팩터링, 동작 변경 없음 | **Mode C: Verify** | 기존 테스트 실행으로 회귀 확인 |
+| Situation | Mode | Approach |
+|-----------|------|----------|
+| New file, no existing tests | **Mode A: New** | Write tests from scratch |
+| Existing file modified, tests exist | **Mode B: Update** | Update existing tests + add new cases |
+| Refactoring, no behavior change | **Mode C: Verify** | Run existing tests to confirm no regression |
 
-### Step 2: 테스트 대상 식별
+### Step 2: Identify Test Targets
 
-- **Happy Path**: 핵심 성공 시나리오
-- **Edge Cases**: 경계값, 빈 입력, 최대값, null/undefined
-- **Error Cases**: 예외 발생, 타임아웃, 잘못된 입력
-- **Integration Points**: 외부 의존성과의 연동 (필요 시 mock)
+- **Happy Path**: Core success scenarios
+- **Edge Cases**: Boundary values, empty input, max values, null/undefined
+- **Error Cases**: Exception throwing, timeouts, invalid input
+- **Integration Points**: External dependency integration (mock if needed)
 
-### Step 3: 테스트 작성
+### Step 3: Write Tests
 
 **Mode A (New Feature):**
-- 프로젝트의 기존 테스트 패턴/프레임워크를 따름
-- 파일 위치: 프로젝트 컨벤션에 맞게 배치
+- Follow the project's existing test patterns/framework
+- File placement: according to project conventions
 
 **Mode B (Modification):**
-1. 기존 테스트 로드
-2. **Gap Analysis**: 새 로직을 기존 테스트가 커버하는가?
-   - No → 새 테스트 케이스 추가
-   - API 시그니처 변경 → 기존 테스트 호출부 수정
-3. 기존 테스트를 삭제하지 않음 (기능이 명시적으로 deprecated된 경우 제외)
+1. Load existing tests
+2. **Gap Analysis**: Do existing tests cover the new logic?
+   - No → Add new test cases
+   - API signature change → Update existing test call sites
+3. Do not delete existing tests (unless functionality is explicitly deprecated)
 
 **Mode C (Refactoring):**
-- 새 테스트 작성 불필요, 기존 테스트 실행으로 회귀 확인
+- No new tests needed; run existing tests to confirm no regression
 
-### Step 4: 테스트 실행 및 분석
+### Step 4: Run Tests & Analyze
 
-**실행:**
-- 새로 작성/수정한 테스트 실행
-- 관련 기존 테스트 스위트도 함께 실행 (회귀 테스트)
+**Execution:**
+- Run newly written/modified tests
+- Also run related existing test suites (regression testing)
 
-**결과 분석:**
+**Result analysis:**
 
-| 결과 | 유형 | 대응 |
-|------|------|------|
-| 컴파일 에러 | 테스트 코드 문제 | 테스트 코드 수정 |
-| 새 테스트 실패 | 새 기능 버그 | **BUG** 보고 |
-| 기존 테스트 실패 | 회귀 | **REGRESSION** 보고 |
-| 전부 통과 | 정상 | Step 5로 진행 |
+| Result | Type | Action |
+|--------|------|--------|
+| Compile error | Test code issue | Fix test code |
+| New test failure | New feature bug | Report as **BUG** |
+| Existing test failure | Regression | Report as **REGRESSION** |
+| All pass | Normal | Proceed to Step 5 |
 
-### Step 5: 테스트 품질 게이트 (Quality Gate)
+### Step 5: Test Quality Gate
 
-> 테스트가 모두 통과해도, 아래 기준을 충족하지 못하면 **⚠️ 경고**합니다.
+> Even if all tests pass, **⚠️ warn** if the following criteria are not met.
 
-**Assertion 품질:**
-- [ ] **Empty Test**: assertion 없이 실행만 하는 테스트가 없는가?
-- [ ] **Tautology**: 항상 참인 assertion(`assertTrue(true)`)이 없는가?
-- [ ] **Assertion 부족**: 실행 후 상태를 충분히 검증하는가? (최소 1개 의미 있는 assertion)
+**Assertion quality:**
+- [ ] **Empty Test**: Are there tests that only execute without any assertions?
+- [ ] **Tautology**: Are there always-true assertions (`assertTrue(true)`)?
+- [ ] **Insufficient assertions**: Is the state sufficiently verified after execution? (minimum 1 meaningful assertion)
 
-**Mock 품질:**
-- [ ] **과도한 Mock**: 테스트 대상까지 mock하고 있지 않은가?
-- [ ] **Mock 미검증**: mock을 설정했으나 verify하지 않는가?
-- [ ] **실제 동작 우선**: 단위 테스트에서 mock 가능하더라도, 통합 테스트에서 실제 동작 검증이 있는가?
+**Mock quality:**
+- [ ] **Excessive mocking**: Is the test target itself being mocked?
+- [ ] **Unverified mocks**: Are mocks set up but never verified?
+- [ ] **Prefer real behavior**: Even if mockable in unit tests, is there integration testing with real behavior?
 
-**커버리지 갭:**
-- [ ] **Error Path 누락**: Happy path만 테스트하고, 실패 경로를 무시하고 있는가?
-- [ ] **경계값 누락**: 0, null, 빈 문자열, 최대값 등 경계값 테스트가 있는가?
-- [ ] **상태 전이 누락**: 상태를 가진 객체에서, 모든 전이 경로를 테스트하는가?
+**Coverage gaps:**
+- [ ] **Missing error paths**: Only happy path tested, failure paths ignored?
+- [ ] **Missing boundary values**: Are there tests for 0, null, empty string, max values, etc.?
+- [ ] **Missing state transitions**: Are all transition paths tested for stateful objects?
 
-### Step 6: 결과 보고
+### Step 6: Report Results
 
 ```
 🧪 Test Report
 
-모드: [A: New / B: Update / C: Verify]
+Mode: [A: New / B: Update / C: Verify]
 
-새 테스트: N개 추가
-수정 테스트: M개
-실행 결과: ✅ 전체 통과 / ❌ N개 실패
+New tests: N added
+Modified tests: M
+Run result: ✅ All pass / ❌ N failed
 
-테스트 품질:
-  Assertion 품질: ✅ / ⚠️ (N건 문제)
-  Mock 품질:      ✅ / ⚠️ (N건 문제)
-  커버리지 갭:    ✅ / ⚠️ (N건 누락)
+Test Quality:
+  Assertion quality: ✅ / ⚠️ (N issue(s))
+  Mock quality:      ✅ / ⚠️ (N issue(s))
+  Coverage gaps:     ✅ / ⚠️ (N gap(s))
 
-[실패 시]
-❌ 실패 목록:
-  - [New/Regression] 테스트명: 실패 원인 요약
+[On failure]
+❌ Failure list:
+  - [New/Regression] Test name: Failure cause summary
 
-[품질 경고 시]
-⚠️ 테스트 품질 경고:
-  - [Empty Test] TestUserCreate: assertion 없음 → 생성된 User의 필드 검증 추가 필요
-  - [Coverage Gap] 에러 경로 미테스트: 존재하지 않는 userId로 조회 시 예외 검증 없음
+[On quality warnings]
+⚠️ Test Quality Warnings:
+  - [Empty Test] TestUserCreate: No assertion → Add field validation for created User
+  - [Coverage Gap] Error path untested: No exception verification for non-existent userId lookup
 ```
 
 ## Constraints
-- 프로젝트의 기존 테스트 프레임워크와 패턴을 따름
-- 기존 테스트를 삭제하지 않음 (deprecated 명시 제외)
-- 테스트명은 테스트 대상 동작을 명확히 설명
-- Mock은 최소한으로 사용, 실제 동작 테스트 우선
-- 테스트 품질 경고는 즉시 수정 강제가 아닌 **개선 제안** — 단, 반복 발견 시 수정 필요
+- Follow the project's existing test framework and patterns
+- Do not delete existing tests (unless explicitly deprecated)
+- Test names must clearly describe the behavior being tested
+- Use mocks minimally; prefer real behavior testing
+- Test quality warnings are **improvement suggestions**, not forced fixes — but fix if found repeatedly

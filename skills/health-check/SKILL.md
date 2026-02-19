@@ -1,73 +1,73 @@
 ---
 name: health-check
 description: |
-  배포 또는 인프라 변경 후 시스템 상태를 점검하고, 롤백 필요 여부를 판단하는 스킬.
-  배포 직후, 인프라 변경 후, 장애 의심 시 사용.
-  트리거: "헬스체크", "배포 확인", "health check", "배포 후 점검"
+  Skill for verifying system status after deployment or infrastructure changes, and determining rollback necessity.
+  Used immediately after deployment, after infra changes, or when an incident is suspected.
+  Triggers: "health check", "deployment verification", "post-deployment check"
 ---
 
 # Health Check
 
 ## Goal
-배포 또는 인프라 변경 후 시스템이 정상 동작하는지 검증하고,
-문제가 있으면 롤백 여부를 판단하여 제안합니다.
+Verify that the system is operating normally after deployment or infrastructure changes, and
+if issues are found, determine and suggest whether to rollback.
 
 ## Instructions
 
-### Step 1: 변경 정보 확인
+### Step 1: Confirm Change Information
 
-- 직전 배포/변경의 요약 (버전, 대상 서비스, 시각)
-- 관련 Implementation Plan 또는 변경 기록 참고
+- Summary of the last deployment/change (version, target service, timestamp)
+- Reference the related Implementation Plan or change records
 
-### Step 2: 헬스체크 실행
+### Step 2: Execute Health Checks
 
-**엔드포인트 점검:**
-- [ ] `/health`, `/ready`, `/live` 등 헬스체크 엔드포인트 호출
-- [ ] HTTP 상태 코드 확인 (200 OK 기대)
-- [ ] 응답 본문에 비정상 표시가 없는지 확인
+**Endpoint checks:**
+- [ ] Call health check endpoints (`/health`, `/ready`, `/live`, etc.)
+- [ ] Verify HTTP status codes (expect 200 OK)
+- [ ] Check response body for abnormal indicators
 
-**비즈니스 경로 점검:**
-- [ ] 핵심 사용자 흐름(로그인, 조회, 생성 등) 시나리오 실행
-- [ ] 에러 응답, 타임아웃, 비정상 데이터 여부 확인
+**Business path checks:**
+- [ ] Execute core user flow scenarios (login, read, create, etc.)
+- [ ] Check for error responses, timeouts, abnormal data
 
-### Step 3: 모니터링 지표 확인
+### Step 3: Verify Monitoring Metrics
 
-| 지표 | 확인 내용 | 이상 기준 |
-|------|----------|----------|
-| 에러율 | 배포 전/후 비교 | 5xx 비율 급증 |
-| 응답 시간 | p50, p95, p99 | 배포 전 대비 2배 이상 증가 |
-| 트래픽 | 요청 수 추이 | 급격한 DROP |
-| CPU/메모리 | 리소스 사용량 | 급격한 증가 또는 OOM |
-| DB 연결 | 커넥션 풀 사용량 | 풀 고갈 징후 |
+| Metric | What to check | Abnormal criteria |
+|--------|---------------|-------------------|
+| Error rate | Compare before/after deployment | Spike in 5xx ratio |
+| Response time | p50, p95, p99 | 2x+ increase vs. pre-deployment |
+| Traffic | Request count trend | Sudden DROP |
+| CPU/Memory | Resource usage | Sudden increase or OOM |
+| DB connections | Connection pool usage | Signs of pool exhaustion |
 
-### Step 4: 로그 샘플링
+### Step 4: Log Sampling
 
-- 직전 N분간 에러/경고 로그 확인
-- 새로운 에러 패턴 식별
-- 반복되는 에러가 있으면 빈도와 패턴 요약
+- Check error/warning logs from the last N minutes
+- Identify new error patterns
+- If recurring errors exist, summarize frequency and pattern
 
-### Step 5: 판단 및 제안
+### Step 5: Verdict & Recommendation
 
-**결과 출력 형식:**
+**Result output format:**
 ```
 🏥 Health Check Report
 
-배포 정보: [서비스명] v[버전] — [시각]
+Deployment info: [Service name] v[Version] — [Timestamp]
 
-헬스 엔드포인트: ✅ / ⚠️ / ❌
-비즈니스 경로:  ✅ / ⚠️ / ❌
-모니터링 지표:  ✅ / ⚠️ / ❌
-로그 상태:      ✅ / ⚠️ / ❌
+Health endpoints: ✅ / ⚠️ / ❌
+Business paths:  ✅ / ⚠️ / ❌
+Monitoring:      ✅ / ⚠️ / ❌
+Log status:      ✅ / ⚠️ / ❌
 
-종합 판단: ✅ 정상 / ⚠️ 관찰 필요 / ❌ 롤백 권고
+Overall verdict: ✅ Healthy / ⚠️ Needs monitoring / ❌ Rollback recommended
 
-[❌인 경우]
-롤백 절차:
+[If ❌]
+Rollback procedure:
   1. ...
   2. ...
 ```
 
 ## Constraints
-- 자동화된 모니터링 도구가 없으면, 사용자에게 수동 확인 항목을 제시
-- 판단이 애매한 경우 "관찰 필요"로 분류하고 추가 모니터링 기간 제안
-- 롤백 권고 시 Implementation Plan의 Rollback Plan 참조
+- If no automated monitoring tools are available, present manual check items to the user
+- If the verdict is ambiguous, classify as "Needs monitoring" and suggest an additional observation period
+- When recommending rollback, reference the Implementation Plan's Rollback Plan
